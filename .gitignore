@@ -1,0 +1,71 @@
+# Generated script output files
+QuotaQuery_*.csv
+QuotaQuery.csv
+AutofitComboMeterData.csv
+ZonePeers.csv
+QuotaQuery*.pbix
+
+# Development tools
+.vscode/
+.cluade/
+.playwright-mcp/
+CLAUDE.md
+AGENTS.md
+azcapman-docusaurus/
+.github/copilot-*.md
+.github/prompts/*
+style-guide/
+
+# Jekyll build output
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# DocFX build output
+obj/
+log/
+api/
+_api/
+*.log.json
+
+# Ruby/Bundler
+vendor/
+.bundle/
+Gemfile.lock
+bin/
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+__MACOSX/
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.#*
+
+# Logs
+*.log
+
+# IDE files
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+Icon?
+
+.opencode/
+out/
+vbd/
+PRD.md
+RETROSPECTIVES.md
+TODO.md
+opencode.*

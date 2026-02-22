@@ -1,0 +1,63 @@
+name: Build release zips
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Stage plugin zip
+        run: |
+          mkdir -p staging/plugin/azure-capacity-management/.claude-plugin
+          mkdir -p staging/plugin/azure-capacity-management/agents
+          mkdir -p staging/plugin/azure-capacity-management/skills/azure-capacity-management/references
+
+          # Manifest and agent
+          cp .claude-plugin/plugin.json staging/plugin/azure-capacity-management/.claude-plugin/
+          cp agents/azure-capacity-manager.md staging/plugin/azure-capacity-management/agents/
+
+          # Skill (resolve symlinks, exclude build artifacts)
+          cp skills/azure-capacity-management/SKILL.md staging/plugin/azure-capacity-management/skills/azure-capacity-management/
+          rsync -a --exclude='_site/' --exclude='.sass-cache/' --exclude='.jekyll-cache/' \
+            --exclude='.jekyll-metadata' --exclude='Gemfile.lock' --exclude='.DS_Store' \
+            --exclude='docfx.yml' --exclude='obj/' --exclude='log/' --exclude='*.log.json' \
+            docs/ staging/plugin/azure-capacity-management/skills/azure-capacity-management/references/docs/
+          rsync -a --exclude='.DS_Store' --exclude='generate_citation_matrix.py' \
+            scripts/ staging/plugin/azure-capacity-management/skills/azure-capacity-management/references/scripts/
+
+          # README
+          cp README-plugin.md staging/plugin/azure-capacity-management/README.md
+
+      - name: Stage skill zip
+        run: |
+          mkdir -p staging/skill/azure-capacity-management/references
+
+          # Skill (resolve symlinks, exclude build artifacts)
+          cp skills/azure-capacity-management/SKILL.md staging/skill/azure-capacity-management/
+          rsync -a --exclude='_site/' --exclude='.sass-cache/' --exclude='.jekyll-cache/' \
+            --exclude='.jekyll-metadata' --exclude='Gemfile.lock' --exclude='.DS_Store' \
+            --exclude='docfx.yml' --exclude='obj/' --exclude='log/' --exclude='*.log.json' \
+            docs/ staging/skill/azure-capacity-management/references/docs/
+          rsync -a --exclude='.DS_Store' --exclude='generate_citation_matrix.py' \
+            scripts/ staging/skill/azure-capacity-management/references/scripts/
+
+      - name: Create zips
+        run: |
+          cd staging/plugin && zip -r ../../azure-capacity-management-plugin.zip azure-capacity-management/
+          cd ../../staging/skill && zip -r ../../azure-capacity-management-skill.zip azure-capacity-management/
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            azure-capacity-management-plugin.zip \
+            azure-capacity-management-skill.zip

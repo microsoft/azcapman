@@ -1,0 +1,1102 @@
+/* ==============================================
+   MS Learn Design System Alignment
+   Based on: https://learn.microsoft.com/en-us/azure/copilot/
+   ============================================== */
+
+/* ---- CSS Custom Properties (Design Tokens) ---- */
+:root {
+  /* Colors - Exact MS Learn palette extracted from live site */
+  --color-primary: #0f6cbd;
+  --color-primary-hover: #115ea3;
+  --color-text-primary: #161616;
+  --color-text-secondary: #505050;
+  --color-text-tertiary: #707070;
+  --color-background: #ffffff;
+  --color-background-subtle: #faf9f8;
+  --color-border: #d1d1d1;
+  --color-border-light: #edebe9;
+
+  /* Hero - MS Learn Azure blue with pattern */
+  --hero-bg: #005ba1;
+
+  /* Shadows - Exact MS Learn values */
+  --shadow-card: rgba(0, 0, 0, 0.13) 0px 1.6px 3.6px 0px, rgba(0, 0, 0, 0.11) 0px 0.3px 0.9px 0px;
+  --shadow-card-hover: rgba(0, 0, 0, 0.18) 0px 3.2px 7.2px 0px, rgba(0, 0, 0, 0.15) 0px 0.6px 1.8px 0px;
+
+  /* Border radius - MS Learn uses subtle rounding */
+  --radius-small: 2px;
+  --radius-medium: 4px;
+
+  /* Typography - MS Learn uses Segoe UI, exact sizes from inspection */
+  --font-family: "Segoe UI", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Helvetica, Ubuntu, Arial, sans-serif;
+  --font-size-base: 14px;
+  --font-size-small: 12px;
+  --font-size-caption: 11px;
+  --font-size-h1: 40px;
+  --font-size-h2: 34px;
+  --font-size-h3: 16px;
+  --line-height-base: 1.5;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+}
+
+/* ---- Base Styles ---- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Links ---- */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ===============================================
+   HERO SECTION - MS Learn Hub Style (Exact Match)
+   =============================================== */
+
+/* Plus pattern SVG for hero background - matches MS Learn */
+.hero {
+  background-color: var(--hero-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='rgba(255,255,255,0.12)' d='M9 0h2v20H9V0zm11 9v2H0V9h20z'/%3E%3C/svg%3E");
+  background-size: 200px;
+  background-repeat: repeat;
+  padding: var(--space-xl) var(--space-lg);
+  color: white;
+  margin-bottom: var(--space-xl);
+  border-radius: 0;
+}
+
+article .hero h1,
+.hero h1 {
+  font-size: var(--font-size-h1);
+  font-weight: 600;
+  line-height: 1.125;
+  margin: 0 0 var(--space-sm) 0;
+  color: white !important;
+}
+
+.hero p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 var(--space-md) 0;
+  opacity: 0.95;
+  max-width: 600px;
+}
+
+.hero .cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 5px 12px;
+  background: white;
+  color: var(--hero-bg);
+  border-radius: var(--radius-medium);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.hero .cta:hover {
+  background: #f3f2f1;
+  text-decoration: none;
+}
+
+.hero .cta:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* ===============================================
+   ICON CARD GRID - MS Learn Hub Pattern
+   =============================================== */
+.icon-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--color-border-light);
+  border: 1px solid var(--color-border-light);
+  margin: var(--space-lg) 0 var(--space-2xl) 0;
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 600px) {
+  .icon-card-grid { grid-template-columns: 1fr; }
+}
+
+/* Individual Icon Card */
+.icon-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-background);
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.icon-card:hover {
+  background: var(--color-background-subtle);
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.icon-card .icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  border-radius: var(--radius-medium);
+}
+
+/* Icon color variants - MS Learn style muted backgrounds */
+.icon-card .icon.orange { background: #fdf4e3; color: #8a5700; }
+.icon-card .icon.purple { background: #f0e6f7; color: #5c2d91; }
+.icon-card .icon.teal   { background: #d9f7f5; color: #006666; }
+.icon-card .icon.blue   { background: #e5f1fb; color: #0078d4; }
+.icon-card .icon.green  { background: #dff6dd; color: #107c10; }
+.icon-card .icon.red    { background: #fde7e9; color: #a80000; }
+
+.icon-card .content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.icon-card .category {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.icon-card .title {
+  font-size: var(--font-size-base);
+  font-weight: 400;
+  color: var(--color-primary);
+  line-height: 1.4;
+}
+
+.icon-card:hover .title {
+  text-decoration: underline;
+}
+
+/* ===============================================
+   SCENARIO SECTION - 3 Column Layout
+   =============================================== */
+.scenario-section {
+  margin: var(--space-2xl) 0;
+}
+
+.scenario-section h2 {
+  font-size: var(--font-size-h2);
+  font-weight: 600;
+  margin: 0 0 var(--space-sm) 0;
+  color: var(--color-text-primary);
+}
+
+.scenario-section > p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xl);
+  border-top: 1px solid var(--color-border-light);
+  padding-top: var(--space-lg);
+}
+
+@media (max-width: 900px) {
+  .scenario-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+}
+
+@media (max-width: 600px) {
+  .scenario-grid { grid-template-columns: 1fr; }
+}
+
+.scenario-column h3 {
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+  margin: 0 0 var(--space-md) 0;
+  color: var(--color-text-primary);
+}
+
+.scenario-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scenario-column li {
+  margin-bottom: var(--space-sm);
+}
+
+.scenario-column li a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-primary);
+  font-size: var(--font-size-base);
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+.scenario-column li a:hover {
+  text-decoration: underline;
+}
+
+/* Document icon prefix - MS Learn style */
+.scenario-column li a::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%230078d4' d='M4 1h5.586L13 4.414V15H4V1zm1 1v12h7V5h-3V2H5zm5 1.414V4h1.586L10 2.414z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
+/* ===============================================
+   EXPLORE MORE SECTION
+   =============================================== */
+.explore-section {
+  margin: var(--space-2xl) 0;
+  border-top: 1px solid var(--color-border-light);
+  padding-top: var(--space-xl);
+}
+
+.explore-section h2 {
+  font-size: var(--font-size-h2);
+  font-weight: 600;
+  margin: 0 0 var(--space-lg) 0;
+  color: var(--color-text-primary);
+}
+
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--color-border-light);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 900px) {
+  .explore-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .explore-grid { grid-template-columns: 1fr; }
+}
+
+.explore-card {
+  padding: var(--space-lg);
+  background: var(--color-background);
+}
+
+.explore-card h3 {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.explore-card h3 a {
+  color: var(--color-primary);
+}
+
+.explore-card h3 a:hover {
+  text-decoration: underline;
+}
+
+.explore-card p {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ===============================================
+   DOCFX OVERRIDES - Align with MS Learn
+   =============================================== */
+
+/* Card styling - shadows instead of heavy borders */
+.card,
+article > div[style*="border: 1px"],
+article > div[style*="box-shadow"] {
+  border: 1px solid var(--color-border-light) !important;
+  box-shadow: var(--shadow-card) !important;
+  border-radius: var(--radius-small) !important;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover) !important;
+}
+
+/* Alert/Callout boxes - MS Learn style */
+.alert,
+[class*="callout"],
+.NOTE, .TIP, .WARNING, .IMPORTANT, .CAUTION {
+  border-radius: var(--radius-small) !important;
+  border-left-width: 4px !important;
+}
+
+/* Table hover states */
+table tbody tr:hover {
+  background-color: var(--color-background-subtle);
+}
+
+/* TOC active item accent */
+.toc .active > a {
+  border-left: 2px solid var(--color-primary);
+  padding-left: calc(1rem - 2px);
+  font-weight: 600;
+}
+
+/* Hide anchor links until hover - MS Learn style */
+h2 a[href^="#"],
+h3 a[href^="#"],
+h4 a[href^="#"] {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  margin-left: var(--space-xs);
+  font-size: 0.8em;
+}
+
+h2:hover a[href^="#"],
+h3:hover a[href^="#"],
+h4:hover a[href^="#"] {
+  opacity: 0.6;
+}
+
+h2 a[href^="#"]:hover,
+h3 a[href^="#"]:hover,
+h4 a[href^="#"]:hover {
+  opacity: 1;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+/* Footer styling */
+footer, .footer {
+  border-top: 1px solid var(--color-border-light);
+  font-size: var(--font-size-small);
+  color: var(--color-text-tertiary);
+}
+
+/* ===============================================
+   CONTENT PAGE STYLING - MS Learn Alignment
+   Extracted from live MS Learn pages 2026-01-08
+   =============================================== */
+
+/* ---- Content Typography ---- */
+article,
+.content,
+main > div {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+article p,
+.content p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+article p:first-child {
+  margin-top: 0;
+}
+
+/* Content headings */
+article h1,
+.content h1 {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--color-text-primary);
+}
+
+article h2,
+.content h2 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  color: var(--color-text-primary);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+article h3,
+.content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: var(--color-text-primary);
+}
+
+article h4,
+.content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+/* Content links - MS Learn purple with underline */
+article a,
+.content a {
+  color: #3b2e58;
+  text-decoration: underline;
+}
+
+article a:hover,
+.content a:hover {
+  color: #5c2d91;
+  text-decoration: underline;
+}
+
+/* Strong text */
+article strong,
+.content strong {
+  font-weight: 600;
+}
+
+/* ---- Lists ---- */
+article ul,
+article ol,
+.content ul,
+.content ol {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+article li,
+.content li {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+article li:last-child,
+.content li:last-child {
+  margin-bottom: 0;
+}
+
+/* Nested lists */
+article ul ul,
+article ol ol,
+article ul ol,
+article ol ul {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+/* ===============================================
+   ALERT/CALLOUT BOXES - MS Learn Style
+   DocFX syntax: [!NOTE], [!TIP], [!WARNING], [!IMPORTANT], [!CAUTION]
+   =============================================== */
+
+/* Base alert styling */
+.alert,
+div.NOTE,
+div.TIP,
+div.WARNING,
+div.IMPORTANT,
+div.CAUTION,
+blockquote.NOTE,
+blockquote.TIP,
+blockquote.WARNING,
+blockquote.IMPORTANT,
+blockquote.CAUTION,
+div[class*="alert-"],
+.IMPORTANT,
+.CAUTION {
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+  font-size: 16px;
+  line-height: 1.6;
+  border: 1px solid;
+}
+
+/* NOTE - Purple/Lavender */
+.alert-info,
+div.NOTE,
+blockquote.NOTE,
+.alert.alert-info {
+  background-color: #efd9fd;
+  border-color: #3b2e58;
+}
+
+.alert-info h5,
+div.NOTE h5,
+blockquote.NOTE h5 {
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #3b2e58;
+}
+
+/* TIP - Green */
+.alert-success,
+div.TIP,
+blockquote.TIP,
+.alert.alert-success {
+  background-color: #f1faf1;
+  border-color: #0e700e;
+}
+
+.alert-success h5,
+div.TIP h5,
+blockquote.TIP h5 {
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #0e700e;
+}
+
+/* WARNING - Yellow/Amber */
+.alert-warning,
+div.WARNING,
+blockquote.WARNING,
+.alert.alert-warning {
+  background-color: #fff4ce;
+  border-color: #8a6914;
+}
+
+.alert-warning h5,
+div.WARNING h5,
+blockquote.WARNING h5 {
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #8a6914;
+}
+
+/* IMPORTANT - Pink/Red */
+.alert-danger,
+div.IMPORTANT,
+blockquote.IMPORTANT,
+.alert.alert-danger {
+  background-color: #fce8e8;
+  border-color: #c42b1c;
+}
+
+.alert-danger h5,
+div.IMPORTANT h5,
+blockquote.IMPORTANT h5 {
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #c42b1c;
+}
+
+/* CAUTION - Orange/Red */
+div.CAUTION,
+blockquote.CAUTION {
+  background-color: #fdf3f2;
+  border-color: #d13438;
+}
+
+div.CAUTION h5,
+blockquote.CAUTION h5 {
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #d13438;
+}
+
+/* Remove default blockquote styling in alerts */
+.alert blockquote,
+div.NOTE blockquote,
+div.TIP blockquote,
+div.WARNING blockquote,
+div.IMPORTANT blockquote,
+div.CAUTION blockquote {
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+/* Alert paragraphs */
+.alert p,
+div.NOTE p,
+div.TIP p,
+div.WARNING p,
+div.IMPORTANT p,
+div.CAUTION p {
+  margin: 0;
+}
+
+.alert p + p,
+div.NOTE p + p,
+div.TIP p + p,
+div.WARNING p + p,
+div.IMPORTANT p + p,
+div.CAUTION p + p {
+  margin-top: 8px;
+}
+
+/* ===============================================
+   CODE BLOCKS - MS Learn Style
+   =============================================== */
+
+/* Inline code */
+code:not(pre code) {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 0.85em;
+  background-color: #e6e6e6;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--color-text-primary);
+}
+
+/* Fenced code blocks */
+pre {
+  background-color: #f5f5f5;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+pre code {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 14px;
+  line-height: 1.45;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: var(--color-text-primary);
+}
+
+/* Code block with language label */
+pre[class*="language-"]::before,
+div.code-header {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===============================================
+   TABLES - MS Learn Style
+   =============================================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+}
+
+thead {
+  background-color: var(--color-background-subtle);
+}
+
+th {
+  font-weight: 700;
+  padding: 12px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 2px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+td {
+  padding: 12px 16px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 14px;
+}
+
+/* Row striping */
+tbody tr:nth-child(even) {
+  background-color: var(--color-background-subtle);
+}
+
+tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Responsive table wrapper */
+.table-responsive,
+div[style*="overflow"] {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===============================================
+   IMAGES AND FIGURES
+   =============================================== */
+
+article img,
+.content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 16px 0;
+}
+
+figure {
+  margin: 24px 0;
+}
+
+figcaption {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* ===============================================
+   DEFINITION LISTS
+   =============================================== */
+
+dl {
+  margin: 16px 0;
+}
+
+dt {
+  font-weight: 600;
+  margin-top: 16px;
+  color: var(--color-text-primary);
+}
+
+dt:first-child {
+  margin-top: 0;
+}
+
+dd {
+  margin-left: 24px;
+  margin-top: 4px;
+  color: var(--color-text-secondary);
+}
+
+/* ===============================================
+   BLOCKQUOTES (non-alert)
+   =============================================== */
+
+blockquote:not(.NOTE):not(.TIP):not(.WARNING):not(.IMPORTANT):not(.CAUTION) {
+  border-left: 4px solid var(--color-border);
+  margin: 16px 0;
+  padding: 8px 16px;
+  background-color: var(--color-background-subtle);
+  color: var(--color-text-secondary);
+}
+
+blockquote:not(.NOTE):not(.TIP):not(.WARNING):not(.IMPORTANT):not(.CAUTION) p {
+  margin: 0;
+}
+
+/* ===============================================
+   HORIZONTAL RULES
+   =============================================== */
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border-light);
+  margin: 32px 0;
+}
+
+/* ===============================================
+   DARK MODE SUPPORT
+   DocFX uses data-bs-theme="dark" attribute on html element
+   =============================================== */
+[data-bs-theme="dark"] {
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #b3b3b3;
+  --color-text-tertiary: #8a8a8a;
+  --color-background: #1a1a1a;
+  --color-background-subtle: #262626;
+  --color-border: #404040;
+  --color-border-light: #333333;
+  --shadow-card: 0 1.6px 3.6px 0 rgba(0,0,0,0.4), 0 0.3px 0.9px 0 rgba(0,0,0,0.3);
+  --shadow-card-hover: 0 3.2px 7.2px 0 rgba(0,0,0,0.4), 0 0.6px 1.8px 0 rgba(0,0,0,0.3);
+}
+
+/* Dark mode - Base text color override */
+[data-bs-theme="dark"] body {
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+}
+
+[data-bs-theme="dark"] article,
+[data-bs-theme="dark"] .content,
+[data-bs-theme="dark"] main > div {
+  color: var(--color-text-primary);
+}
+
+[data-bs-theme="dark"] article p,
+[data-bs-theme="dark"] .content p,
+[data-bs-theme="dark"] article li,
+[data-bs-theme="dark"] .content li {
+  color: var(--color-text-primary);
+}
+
+[data-bs-theme="dark"] article h1,
+[data-bs-theme="dark"] article h2,
+[data-bs-theme="dark"] article h3,
+[data-bs-theme="dark"] article h4,
+[data-bs-theme="dark"] .content h1,
+[data-bs-theme="dark"] .content h2,
+[data-bs-theme="dark"] .content h3,
+[data-bs-theme="dark"] .content h4 {
+  color: var(--color-text-primary);
+}
+
+[data-bs-theme="dark"] .icon-card .icon.orange { background: #3d2a00; color: #ffc83d; }
+[data-bs-theme="dark"] .icon-card .icon.purple { background: #2d1a4e; color: #b794f4; }
+[data-bs-theme="dark"] .icon-card .icon.teal   { background: #003333; color: #4fd1c5; }
+[data-bs-theme="dark"] .icon-card .icon.blue   { background: #002a4a; color: #63b3ed; }
+[data-bs-theme="dark"] .icon-card .icon.green  { background: #0a3d0a; color: #68d391; }
+[data-bs-theme="dark"] .icon-card .icon.red    { background: #3d0a0a; color: #fc8181; }
+
+[data-bs-theme="dark"] .hero .cta {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+[data-bs-theme="dark"] .hero .cta:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+[data-bs-theme="dark"] .hero {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='rgba(255,255,255,0.05)' d='M9 0h2v20H9V0zm11 9v2H0V9h20z'/%3E%3C/svg%3E");
+}
+
+[data-bs-theme="dark"] .scenario-column li a::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2363b3ed' d='M4 1h5.586L13 4.414V15H4V1zm1 1v12h7V5h-3V2H5zm5 1.414V4h1.586L10 2.414z'/%3E%3C/svg%3E");
+}
+
+/* Dark mode - Content links */
+[data-bs-theme="dark"] article a,
+[data-bs-theme="dark"] .content a {
+  color: #b794f4;
+}
+
+[data-bs-theme="dark"] article a:hover,
+[data-bs-theme="dark"] .content a:hover {
+  color: #d6bcfa;
+}
+
+/* Dark mode - Inline code */
+[data-bs-theme="dark"] code:not(pre code) {
+  background-color: #333333;
+  color: #f5f5f5;
+}
+
+/* Dark mode - Code blocks */
+[data-bs-theme="dark"] pre {
+  background-color: #262626;
+  border-color: #404040;
+}
+
+[data-bs-theme="dark"] pre code {
+  color: #f5f5f5;
+}
+
+/* Dark mode - Tables */
+[data-bs-theme="dark"] table {
+  border-color: var(--color-border);
+}
+
+[data-bs-theme="dark"] th {
+  background-color: var(--color-background-subtle);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-bs-theme="dark"] td {
+  border-color: var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+[data-bs-theme="dark"] tbody tr:nth-child(even) {
+  background-color: var(--color-background-subtle);
+}
+
+[data-bs-theme="dark"] tbody tr:hover {
+  background-color: #333333;
+}
+
+/* Dark mode - Alert boxes */
+[data-bs-theme="dark"] .alert-info,
+[data-bs-theme="dark"] div.NOTE,
+[data-bs-theme="dark"] blockquote.NOTE,
+[data-bs-theme="dark"] .alert.alert-info {
+  background-color: #2d1a4e;
+  border-color: #6b5b95;
+  color: #e0d0f0;
+}
+
+[data-bs-theme="dark"] .alert-info h5,
+[data-bs-theme="dark"] div.NOTE h5,
+[data-bs-theme="dark"] blockquote.NOTE h5 {
+  color: #b794f4;
+}
+
+[data-bs-theme="dark"] .alert-info p,
+[data-bs-theme="dark"] div.NOTE p,
+[data-bs-theme="dark"] blockquote.NOTE p {
+  color: #e0d0f0;
+}
+
+[data-bs-theme="dark"] .alert-success,
+[data-bs-theme="dark"] div.TIP,
+[data-bs-theme="dark"] blockquote.TIP,
+[data-bs-theme="dark"] .alert.alert-success {
+  background-color: #0a3d0a;
+  border-color: #2d862d;
+  color: #c6f6c6;
+}
+
+[data-bs-theme="dark"] .alert-success h5,
+[data-bs-theme="dark"] div.TIP h5,
+[data-bs-theme="dark"] blockquote.TIP h5 {
+  color: #68d391;
+}
+
+[data-bs-theme="dark"] .alert-success p,
+[data-bs-theme="dark"] div.TIP p,
+[data-bs-theme="dark"] blockquote.TIP p {
+  color: #c6f6c6;
+}
+
+[data-bs-theme="dark"] .alert-warning,
+[data-bs-theme="dark"] div.WARNING,
+[data-bs-theme="dark"] blockquote.WARNING,
+[data-bs-theme="dark"] .alert.alert-warning {
+  background-color: #3d2a00;
+  border-color: #8a6914;
+  color: #ffe5a0;
+}
+
+[data-bs-theme="dark"] .alert-warning h5,
+[data-bs-theme="dark"] div.WARNING h5,
+[data-bs-theme="dark"] blockquote.WARNING h5 {
+  color: #ffc83d;
+}
+
+[data-bs-theme="dark"] .alert-warning p,
+[data-bs-theme="dark"] div.WARNING p,
+[data-bs-theme="dark"] blockquote.WARNING p {
+  color: #ffe5a0;
+}
+
+[data-bs-theme="dark"] .alert-danger,
+[data-bs-theme="dark"] div.IMPORTANT,
+[data-bs-theme="dark"] blockquote.IMPORTANT,
+[data-bs-theme="dark"] .alert.alert-danger {
+  background-color: #3d0a0a;
+  border-color: #c42b1c;
+  color: #ffc0c0;
+}
+
+[data-bs-theme="dark"] .alert-danger h5,
+[data-bs-theme="dark"] div.IMPORTANT h5,
+[data-bs-theme="dark"] blockquote.IMPORTANT h5 {
+  color: #fc8181;
+}
+
+[data-bs-theme="dark"] .alert-danger p,
+[data-bs-theme="dark"] div.IMPORTANT p,
+[data-bs-theme="dark"] blockquote.IMPORTANT p {
+  color: #ffc0c0;
+}
+
+[data-bs-theme="dark"] div.CAUTION,
+[data-bs-theme="dark"] blockquote.CAUTION {
+  background-color: #3d1515;
+  border-color: #d13438;
+  color: #ffc0c0;
+}
+
+[data-bs-theme="dark"] div.CAUTION h5,
+[data-bs-theme="dark"] blockquote.CAUTION h5 {
+  color: #fc8181;
+}
+
+[data-bs-theme="dark"] div.CAUTION p,
+[data-bs-theme="dark"] blockquote.CAUTION p {
+  color: #ffc0c0;
+}
+
+/* Dark mode - Blockquotes */
+[data-bs-theme="dark"] blockquote:not(.NOTE):not(.TIP):not(.WARNING):not(.IMPORTANT):not(.CAUTION) {
+  border-left-color: #505050;
+  background-color: #262626;
+  color: var(--color-text-secondary);
+}
+
+[data-bs-theme="dark"] blockquote:not(.NOTE):not(.TIP):not(.WARNING):not(.IMPORTANT):not(.CAUTION) p {
+  color: var(--color-text-secondary);
+}
