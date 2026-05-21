@@ -7,7 +7,7 @@ This repository contains Azure quota and capacity management references for SaaS
 
 ## 📖 Documentation
 
-View the documentation at: **https://msbrettorg.github.io/azcapman/**
+View the documentation at: **https://microsoft.github.io/azcapman/**
 
 The documentation is organized into:
 
