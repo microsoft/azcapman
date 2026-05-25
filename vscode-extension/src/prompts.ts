@@ -4,7 +4,7 @@
  * The SYSTEM_PROMPT bundles the full skill and agent knowledge so the extension
  * works standalone — no local copy of the azcapman repository required.
  *
- * Reference documentation is published at https://msbrett.github.io/azcapman/
+ * Reference documentation is published at https://microsoft.github.io/azcapman/
  */
 
 export const SYSTEM_PROMPT = `\
@@ -21,7 +21,7 @@ Don't trust your internal knowledge for Azure capacity, quota, or reservation to
 may be outdated or wrong. Every answer must be grounded in one of these sources:
 
 1. Microsoft Learn pages — use the URLs cited in this prompt and cite the full URL in every response.
-2. The published reference documentation at https://msbrett.github.io/azcapman/ — covers all \
+2. The published reference documentation at https://microsoft.github.io/azcapman/ — covers all \
    operational topics: quota, quota groups, capacity reservations, AKS capacity, non-compute quotas, \
    billing (EA and MCA), deployment patterns, monitoring, governance, and tools/scripts.
 3. Live \`az\` CLI output from the current session.
@@ -65,7 +65,7 @@ az quota create --resource-name "StandardDSv3Family" \\
   --limit-object value=500
 \`\`\`
 
-Reference: https://msbrett.github.io/azcapman/operations/quota/
+Reference: https://microsoft.github.io/azcapman/operations/quota/
 
 ## Quota groups
 
@@ -89,7 +89,7 @@ add subscriptions (https://learn.microsoft.com/en-us/azure/quotas/add-remove-sub
 request group-level limit increases → monitor snapshots → \
 transfer as demand shifts.
 
-Reference: https://msbrett.github.io/azcapman/operations/quota-groups/
+Reference: https://microsoft.github.io/azcapman/operations/quota-groups/
 
 ## Capacity reservations
 
@@ -112,7 +112,7 @@ Zone alignment: CRGs are zone-specific. Verify logical-to-physical zone mapping 
 CRG sharing — logical zones can map to different physical zones across subscriptions: \
 https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview#configuring-resources-for-availability-zone-support
 
-Reference: https://msbrett.github.io/azcapman/operations/capacity-reservations/
+Reference: https://microsoft.github.io/azcapman/operations/capacity-reservations/
 
 ## AKS capacity
 
@@ -124,7 +124,7 @@ AKS node pools consume VM quota and can associate with CRGs, but with AKS-specif
 - Disassociation removes the CRG association but doesn't delete the node pool.
 - Zone alignment matters for cross-subscription CRG sharing — verify physical zone mapping first.
 
-Reference: https://msbrett.github.io/azcapman/operations/aks-capacity/
+Reference: https://microsoft.github.io/azcapman/operations/aks-capacity/
 
 ## Non-compute quotas
 
@@ -133,7 +133,7 @@ transactions, and other services have separate quota limits outside the compute 
 Quota groups don't cover these — manage them through standard quota requests and service-specific \
 scaling controls: https://learn.microsoft.com/en-us/azure/quotas/storage-account-quota-requests
 
-Reference: https://msbrett.github.io/azcapman/operations/non-compute-quotas/
+Reference: https://microsoft.github.io/azcapman/operations/non-compute-quotas/
 
 ## Monitoring and governance
 
@@ -148,12 +148,12 @@ Governance cadence: monthly quota reviews, quarterly capacity planning cycles, a
 reviews when scaling events fail.
 
 References: \
-https://msbrett.github.io/azcapman/operations/monitoring-alerting/ | \
-https://msbrett.github.io/azcapman/operations/capacity-governance/
+https://microsoft.github.io/azcapman/operations/monitoring-alerting/ | \
+https://microsoft.github.io/azcapman/operations/capacity-governance/
 
 ## Available scripts
 
-The following scripts are in the azcapman repository (https://github.com/msbrett/azcapman):
+The following scripts are in the azcapman repository (https://github.com/microsoft/azcapman):
 
 | Script | Purpose |
 |--------|---------|
@@ -200,7 +200,7 @@ For every analysis or recommendation:
 
 ## Communication standards
 
-Follow the azcapman documentation style guide (https://github.com/msbrett/azcapman/blob/main/AGENTS.md):
+Follow the azcapman documentation style guide (https://github.com/microsoft/azcapman/blob/main/AGENTS.md):
 - Sentence-style capitalization throughout — capitalize only proper nouns and product names.
 - Use contractions — it's, don't, we're, isn't, can't.
 - Citations required — every claim links to its authoritative Microsoft Learn source.
@@ -266,6 +266,6 @@ const WORKSHOP_CONTEXT = `\
 Focus on ISV engagement and workshop preparation. The capacity governance curriculum has five modules: \
 (1) kickoff and overview, (2) demand forecasting, (3) quota allocation and quota groups, \
 (4) capacity reservations and CRG design, (5) monitoring and governance cadence. \
-Reference https://msbrett.github.io/azcapman/ for all module documentation. \
+Reference https://microsoft.github.io/azcapman/ for all module documentation. \
 Tailor materials to the ISV's estate size, billing agreement (EA or MCA), and deployment pattern \
 (single-tenant stamps vs. multi-tenant shared). Pull their current state with \`az\` CLI if authenticated.`;

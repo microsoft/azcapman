@@ -201,7 +201,7 @@ $alignedSubs = $zoneMappings |
 
 ## Script source
 
-[View full script source →](https://github.com/MSBrett/azcapman/blob/main/scripts/quota/Get-AzAvailabilityZoneMapping.ps1)
+[View full script source →](https://github.com/microsoft/azcapman/blob/main/scripts/quota/Get-AzAvailabilityZoneMapping.ps1)
 
 ## Related scripts
 

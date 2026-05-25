@@ -169,7 +169,7 @@ This script output integrates with:
 
 ## Script source
 
-[View full script source →](https://github.com/MSBrett/azcapman/blob/main/scripts/quota/Get-AzVMQuotaUsage.ps1)
+[View full script source →](https://github.com/microsoft/azcapman/blob/main/scripts/quota/Get-AzVMQuotaUsage.ps1)
 
 ## Related scripts
 

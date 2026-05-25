@@ -37,7 +37,7 @@ build:
     _appTitle: ISV Quota & Capacity Management
     _appFooter: Copyright © 2024 Microsoft Corporation
     _gitContribute:
-      repo: https://github.com/msbrett/azcapman
+      repo: https://github.com/microsoft/azcapman
       branch: main
   template:
   - default

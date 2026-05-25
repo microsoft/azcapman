@@ -7,9 +7,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/msbrett/azcapman"
+    "url": "https://github.com/microsoft/azcapman"
   },
-  "homepage": "https://msbrett.github.io/azcapman/",
+  "homepage": "https://microsoft.github.io/azcapman/",
   "engines": {
     "vscode": "^1.95.0"
   },
