@@ -1,0 +1,1 @@
+/Users/brett/src/azcapman/agents/azure-capacity-manager.md

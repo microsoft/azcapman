@@ -10,7 +10,7 @@ This repository is configured to automatically deploy documentation to GitHub Pa
    ```
 
 2. **Enable GitHub Pages in repository settings**:
-   - Go to your repository on GitHub: https://github.com/msbrett/azcapman
+   - Go to your repository on GitHub: https://github.com/microsoft/azcapman
    - Click on **Settings** tab
    - Scroll down to **Pages** section in the left sidebar
    - Under **Source**, select **GitHub Actions**
@@ -22,7 +22,7 @@ This repository is configured to automatically deploy documentation to GitHub Pa
 
 4. **Access your documentation**:
    - Once deployed, your documentation will be available at:
-   - https://msbrett.github.io/azcapman/
+   - https://microsoft.github.io/azcapman/
 
 ## Local Development
 

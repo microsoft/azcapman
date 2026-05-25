@@ -1,4 +1,8 @@
 #!/usr/bin/env pwsh
+
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 <#
 .SYNOPSIS
     Deploy budget configuration to an Azure subscription.

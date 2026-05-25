@@ -251,12 +251,12 @@ Connect-AzAccount -Identity
 
 ## Script source
 
-[View full script source →](https://github.com/MSBrett/azcapman/blob/main/scripts/anomaly-alerts/Deploy-BulkALZ.ps1)
+[View full script source →](https://github.com/microsoft/azcapman/blob/main/scripts/anomaly-alerts/Deploy-BulkALZ.ps1)
 
 ## Related scripts
 
 - [Deploy-AnomalyAlert.ps1](deploy-anomalyalert.md) - Individual subscription deployment
-- [anomaly-alert.bicep](https://github.com/MSBrett/azcapman/blob/main/scripts/anomaly-alerts/anomaly-alert.bicep) - Bicep template
+- [anomaly-alert.bicep](https://github.com/microsoft/azcapman/blob/main/scripts/anomaly-alerts/anomaly-alert.bicep) - Bicep template
 
 ## Related documentation
 

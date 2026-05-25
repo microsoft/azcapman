@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 name: Build release zips
 
 on:
@@ -49,10 +52,19 @@ jobs:
           rsync -a --exclude='.DS_Store' --exclude='generate_citation_matrix.py' \
             scripts/ staging/skill/azure-capacity-management/references/scripts/
 
+      - name: Stage SRE Agent zip
+        run: |
+          mkdir -p staging/sre-agent/azure-capacity-management-sre-agent
+
+          # T-24: RTM NFR-8.1
+          rsync -a --exclude='.DS_Store' \
+            sre-agent/ staging/sre-agent/azure-capacity-management-sre-agent/
+
       - name: Create zips
         run: |
           cd staging/plugin && zip -r ../../azure-capacity-management-plugin.zip azure-capacity-management/
           cd ../../staging/skill && zip -r ../../azure-capacity-management-skill.zip azure-capacity-management/
+          cd ../../staging/sre-agent && zip -r ../../azure-capacity-management-sre-agent.zip azure-capacity-management-sre-agent/
 
       - name: Upload release assets
         env:
@@ -60,4 +72,5 @@ jobs:
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
             azure-capacity-management-plugin.zip \
-            azure-capacity-management-skill.zip
+            azure-capacity-management-skill.zip \
+            azure-capacity-management-sre-agent.zip

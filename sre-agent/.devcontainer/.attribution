@@ -1,0 +1,6 @@
+T-30: RTM NFR-11.4
+
+This directory is adapted from the `.devcontainer/` assets in
+https://github.com/matthansen0/azure-sre-agent-sandbox.
+
+Original source repository license: MIT.

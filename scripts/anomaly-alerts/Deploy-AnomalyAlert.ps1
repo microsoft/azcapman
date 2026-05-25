@@ -1,4 +1,8 @@
 #!/usr/bin/env pwsh
+
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 <#
 .SYNOPSIS
     Deploy anomaly alert configuration to an Azure subscription.

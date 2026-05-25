@@ -232,12 +232,12 @@ $deployment.Properties.StatusMessage
 
 ## Script source
 
-[View full script source →](https://github.com/MSBrett/azcapman/blob/main/scripts/anomaly-alerts/Deploy-AnomalyAlert.ps1)
+[View full script source →](https://github.com/microsoft/azcapman/blob/main/scripts/anomaly-alerts/Deploy-AnomalyAlert.ps1)
 
 ## Related scripts
 
 - [Deploy-BulkALZ.ps1](deploy-bulkalz.md) - Enterprise bulk deployment
-- [anomaly-alert.bicep](https://github.com/MSBrett/azcapman/blob/main/scripts/anomaly-alerts/anomaly-alert.bicep) - Bicep template
+- [anomaly-alert.bicep](https://github.com/microsoft/azcapman/blob/main/scripts/anomaly-alerts/anomaly-alert.bicep) - Bicep template
 
 ## Related documentation
 

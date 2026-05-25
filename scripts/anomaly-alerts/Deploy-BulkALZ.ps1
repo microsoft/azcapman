@@ -1,5 +1,8 @@
 #!/usr/bin/env pwsh
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 <#
 .SYNOPSIS
     Deploy anomaly alerts to all subscriptions in a management group.

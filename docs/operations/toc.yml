@@ -3,7 +3,7 @@
   items:
     - name: Overview
       href: README.md
-    - name: Forecast
+    - name: Planning and forecasting
       href: capacity-planning/README.md
       items:
         - name: Capacity and billing operations
@@ -19,7 +19,7 @@
               href: ../deployment/single-tenant/README.md
             - name: Multi-tenant
               href: ../deployment/multi-tenant/README.md
-    - name: Procure
+    - name: Workload placement
       href: quota/README.md
       items:
         - name: Billing models
@@ -49,19 +49,19 @@
           href: aks-capacity/README.md
         - name: Non-compute quotas
           href: non-compute-quotas/README.md
-    - name: Allocate
+    - name: Usage and rate optimization
       href: quota-groups/README.md
       items:
         - name: Quota groups
           href: quota-groups/README.md
-    - name: Monitor
+    - name: Governance and automation
       href: monitoring-alerting/README.md
       items:
-        - name: Monitoring & alerting
+        - name: Monitoring and alerting
           href: monitoring-alerting/README.md
         - name: Capacity governance
           href: capacity-governance/README.md
-        - name: Tools & scripts
+        - name: Tools and scripts
           href: tools-scripts/README.md
           items:
             - name: Overview
@@ -78,7 +78,7 @@
               href: tools-scripts/deploy-anomalyalert.md
             - name: Deploy-BulkALZ.ps1
               href: tools-scripts/deploy-bulkalz.md
-        - name: Support & reference
+        - name: Support and reference
           href: support-and-reference/README.md
           items:
             - name: Overview

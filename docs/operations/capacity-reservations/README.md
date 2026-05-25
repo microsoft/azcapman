@@ -6,7 +6,7 @@ nav_order: 2
 
 # Capacity reservation operations
 
-> Where this fits: step 3 of the capacity supply chain. Use capacity reservations after access and quota are staged, so critical SKUs, regions, and zones are covered before you onboard or surge. [Source](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-overview)
+> FinOps capability mapping: Capacity reservations support Architecting & Workload Placement, Usage Optimization, Rate Optimization coordination, Planning & Estimating, and Automation, Tools & Services. Use them after access and quota are staged, so critical SKUs, regions, and zones are covered before you onboard or surge. [Source](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-overview) [Source](https://www.finops.org/framework/capabilities/)
 
 On-demand capacity reservations guarantee that compute capacity is available when critical workloads scale out. This guide explains how to create, share, monitor, and automate capacity reservation groups (CRGs) so platform teams can coordinate with quota and deployment workflows, and it reminds you where the platform enforces prerequisites.
 

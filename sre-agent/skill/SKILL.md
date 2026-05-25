@@ -1,0 +1,1 @@
+../../skills/azure-capacity-management/SKILL.md
