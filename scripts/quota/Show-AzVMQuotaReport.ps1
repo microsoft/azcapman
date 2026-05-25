@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 
 <#
 .SYNOPSIS
@@ -13,11 +15,15 @@
     - Region-level restrictions for specific VM SKUs
     - Physical vs. logical availability zone mappings (optional)
 
+    The Catalogs API is the primary SKU source. The deprecated meter data CSV is used only as a
+    fallback when Catalogs API lookup fails and the SKUs parameter is not provided.
+
     Unlike the multi-threaded Get-AzVMQuotaUsage.ps1, this version processes subscriptions
     sequentially and displays results in a formatted table at the end.
 
 .PARAMETER SKUs
-    Array of VM SKU names to analyze. If not specified, downloads and uses all available SKUs.
+    Array of VM SKU names to analyze. If not specified, resolves VM SKUs from the Azure Catalogs
+    API first and falls back to the deprecated meter data CSV only if that lookup fails.
     Example: @('Standard_D2s_v3', 'Standard_D4s_v3', 'Standard_E4s_v5')
 
 .PARAMETER Locations
@@ -29,8 +35,12 @@
     Example: @('00000000-0000-0000-0000-000000000000')
 
 .PARAMETER MeterDataUri
-    URL to download normalized VM SKU list from Cost Management connector data.
-    Used when SKUs parameter is not provided.
+    Deprecated fallback source URI for normalized VM SKU data from Cost Management connector data.
+    Used only when the Catalogs API lookup fails and the SKUs parameter is not provided.
+
+.PARAMETER CatalogLocation
+    Azure region used for Catalogs API requests when resolving VM SKU names from the primary SKU
+    source.
 
 .PARAMETER OutputFile
     Name of the output CSV file containing the analysis results.
@@ -52,6 +62,7 @@
 
 .NOTES
     Requires Azure PowerShell module and authenticated session with Reader access to target subscriptions.
+    Catalogs API access also requires the Microsoft.Capacity/catalogs/read permission.
     This is a simplified, educational version of the quota analysis functionality.
     For production use with large numbers of subscriptions, consider using Get-AzVMQuotaUsage.ps1 instead.
     
@@ -70,8 +81,11 @@ param (
     [Parameter(Mandatory = $false, HelpMessage = "e.g. @('00000000-0000-0000-0000-000000000000')")]
     [string[]]$SubscriptionIds = @(),
 
-    [Parameter(Mandatory = $false, HelpMessage = "Location to download normalized list of VM SKUs")]
-    [string]$MeterDataUri = "https://ccmstorageprod.blob.core.windows.net/costmanagementconnector-data/AutofitComboMeterData.csv",
+    [Parameter(Mandatory = $false, HelpMessage = "Deprecated fallback URL to download normalized VM SKU list")]
+    [string]$MeterDataUri = "https://ccmstorageprod.blob.core.windows.net/instancesizeflexibility-data/isfratioblob.csv",
+
+    [Parameter(Mandatory = $false, HelpMessage = "Azure region to query for VM catalog data")]
+    [string]$CatalogLocation = "eastus",
     
     [Parameter(Mandatory = $false, HelpMessage = "Output CSV filename")]
     [string]$OutputFile = "QuotaQuery.csv",
@@ -86,27 +100,114 @@ param (
 
 <#
 .SYNOPSIS
-    Downloads and parses the normalized VM SKU list from Cost Management data.
+    Retrieves normalized VM SKU names from the Azure Catalogs API, with CSV as fallback.
 
 .DESCRIPTION
-    Retrieves the AutofitComboMeterData.csv file containing normalized VM SKU names.
-    Filters out SQL-related SKUs and returns unique SKU names for quota analysis.
+    Queries the Azure Catalogs API for normalized VM SKU names and uses that as the
+    primary source for quota analysis. If the Catalogs API call fails, falls back to
+    AutofitComboMeterData.csv. Filters out SQL-related SKUs and returns unique SKU names.
 
 .OUTPUTS
     Array of normalized VM SKU names (e.g., 'Standard_D2s_v3', 'Standard_E4s_v5')
 #>
 function Get-SKUDetails {
-    Write-Host "Downloading VM SKU Details"
-    
-    # Extract filename from URI for local storage (more robust approach)
-    [string]$meterDataFile = $MeterDataUri.Split('/')[$MeterDataUri.Split('/').Length - 1]
-    
-    # Download the Cost Management connector data file
-    Invoke-WebRequest -Uri $MeterDataUri -OutFile $meterDataFile
-    
-    # Parse CSV and extract unique, non-SQL VM SKUs
-    $meterData = Get-Content $meterDataFile | ConvertFrom-Csv
-    return ($meterData | Select-Object -Property NormalizedSKU -Unique | Where-Object { $_.NormalizedSKU -notlike "*sql*" }).NormalizedSKU
+    try {
+        Write-Host "Querying Azure Catalogs API for VM SKU details in $CatalogLocation"
+        $catalogData = Get-VMCatalogData -SubscriptionId $SubscriptionIds[0] -Location $CatalogLocation
+        [string[]]$skuNames = @(
+            ($catalogData | Select-Object -Property ArmSkuName -Unique | Where-Object { $_.ArmSkuName -notlike "*sql*" }).ArmSkuName |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+        )
+
+        if ($skuNames.Count -eq 0) {
+            throw "Catalogs API returned zero VM SKUs"
+        }
+
+        Write-Host "Retrieved $($skuNames.Count) unique VM SKUs from Catalogs API"
+        return $skuNames
+    }
+    catch {
+        Write-Warning "Catalogs API failed: $($_.Exception.Message)"
+        Write-Warning "Falling back to CSV download from $MeterDataUri"
+
+        # Extract filename from URI for local storage (more robust approach)
+        [string]$meterDataFile = $MeterDataUri.Split('/')[$MeterDataUri.Split('/').Length - 1]
+
+        # Download the Cost Management connector data file
+        Invoke-WebRequest -Uri $MeterDataUri -OutFile $meterDataFile
+
+        # Parse CSV and extract unique, non-SQL VM SKUs
+        $meterData = Get-Content $meterDataFile | ConvertFrom-Csv
+        [string[]]$skuNames = @(
+            ($meterData | Select-Object -Property ArmSkuName -Unique | Where-Object { $_.ArmSkuName -notlike "*sql*" }).ArmSkuName |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+        )
+        return $skuNames
+    }
+}
+
+<#
+.SYNOPSIS
+    Retrieves VM catalog data from the Azure Microsoft.Capacity catalogs API.
+
+.DESCRIPTION
+    Calls the Azure catalogs endpoint for VirtualMachines in the specified subscription
+    and location using Invoke-AzRestMethod. Follows any nextLink values until all pages
+    are retrieved and returns only entries that contain the required instance size
+    flexibility properties.
+
+.PARAMETER SubscriptionId
+    The Azure subscription ID used to scope the catalogs API request.
+
+.PARAMETER Location
+    The Azure region name used in the catalogs API filter.
+
+.OUTPUTS
+    Array of PSCustomObject values with InstanceSizeFlexibilityGroup, ArmSkuName, and Ratio properties.
+#>
+function Get-VMCatalogData {
+    param (
+        [string]$SubscriptionId,
+        [string]$Location
+    )
+
+    $catalogItems = [System.Collections.Generic.List[object]]::new()
+    $path = "/subscriptions/{0}/providers/Microsoft.Capacity/catalogs?api-version=2022-11-01&reservedResourceType=VirtualMachines&location={1}" -f $SubscriptionId, $Location
+    $nextLink = $null
+
+    do {
+        $response = if ([string]::IsNullOrWhiteSpace($nextLink)) {
+            Invoke-AzRestMethod -Method GET -Path $path
+        }
+        else {
+            Invoke-AzRestMethod -Method GET -Uri $nextLink
+        }
+
+        $payload = $response.Content | ConvertFrom-Json -Depth 10
+
+        foreach ($item in @($payload.value)) {
+            $groupProperty = @($item.skuProperties | Where-Object { $_.name -eq 'ReservationsAutofitGroup' } | Select-Object -First 1)
+            $ratioProperty = @($item.skuProperties | Where-Object { $_.name -eq 'ReservationsAutofitRatio' } | Select-Object -First 1)
+
+            if ([string]::IsNullOrWhiteSpace([string]$item.name) -or
+                $groupProperty.Count -eq 0 -or
+                $ratioProperty.Count -eq 0 -or
+                [string]::IsNullOrWhiteSpace([string]$groupProperty[0].value) -or
+                [string]::IsNullOrWhiteSpace([string]$ratioProperty[0].value)) {
+                continue
+            }
+
+            $catalogItems.Add([PSCustomObject]@{
+                    InstanceSizeFlexibilityGroup = $groupProperty[0].value
+                    ArmSkuName                   = $item.name
+                    Ratio                        = $ratioProperty[0].value
+                })
+        }
+
+        $nextLink = $payload.nextLink
+    } while (-not [string]::IsNullOrWhiteSpace($nextLink))
+
+    return $catalogItems.ToArray()
 }
 
 <#
@@ -380,11 +481,6 @@ $csvHeaderString | Out-File -Force -FilePath $OutputFile
 # This is needed for constructing REST API calls and may vary by cloud (Public, Government, etc.)
 $resourceManagerUrl = (Get-AzContext).Environment.ResourceManagerUrl
 
-# Populate SKUs list if not provided by user
-if ($SKUs.Count -eq 0) {
-    $SKUs = Get-SKUDetails
-}
-
 # Populate subscription list if not provided by user
 if ($SubscriptionIds.Count -eq 0) {
     $SubscriptionIds = Get-SubscriptionIds
@@ -392,7 +488,12 @@ if ($SubscriptionIds.Count -eq 0) {
 
 # Populate locations list if not provided by user
 if ($Locations.Count -eq 0) {
-    $Locations = Get-Locations
+    $Locations = Get-Locations | Sort-Object
+}
+
+# Populate SKUs list if not provided by user
+if ($SKUs.Count -eq 0) {
+    $SKUs = Get-SKUDetails
 }
 
 # Display configuration information

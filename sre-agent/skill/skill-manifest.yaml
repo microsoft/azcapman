@@ -1,0 +1,15 @@
+# T-17: RTM FR-8.1
+name: azure-capacity-management
+description: >
+  Use when investigating Azure quota exhaustion, quota limit issues, capacity
+  reservation group problems, quota group management, region access restrictions,
+  zonal enablement issues, Azure capacity evidence for FinOps Planning & Estimating,
+  Forecasting, Architecting & Workload Placement, Usage Optimization, Rate Optimization,
+  Governance, Policy & Risk, and Automation, Tools & Services, or savings plan and reservation benefit
+  analysis for SaaS ISV workloads.
+files:
+  - SKILL.md
+tools:
+  - RunAzCliReadCommands
+  - RunAzCliWriteCommands
+  - GetAzCliHelp

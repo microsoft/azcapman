@@ -59,12 +59,13 @@ Get-AzRoleAssignment | Where-Object {$_.RoleDefinitionName -like "*Reader*"}
 
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
-| **SKUs** | String[] | Array of VM SKU names to analyze | Downloads all SKUs |
+| **SKUs** | String[] | Array of VM SKU names to analyze | Catalogs API-first discovery; falls back to deprecated CSV only if API lookup fails and `-SKUs` is omitted |
 | **Locations** | String[] | Array of Azure regions to query | All regions |
 | **SubscriptionIds** | String[] | Array of subscription IDs to analyze | All accessible subscriptions |
+| **CatalogLocation** | String | Azure region used for Catalogs API lookup | eastus |
 | **OutputFile** | String | CSV output filename | QuotaQuery.csv |
 | **UsePhysicalZones** | Switch | Map logical zones to physical datacenters | False |
-| **MeterDataUri** | String | URL for VM SKU metadata | Azure public data |
+| **MeterDataUri** | String | Deprecated fallback source URI for VM SKU metadata, used only when Catalogs API lookup fails and `-SKUs` is not provided | Azure public data |
 
 ## Usage examples
 
@@ -92,7 +93,7 @@ Get-AzRoleAssignment | Where-Object {$_.RoleDefinitionName -like "*Reader*"}
     -OutputFile "EastUSQuotaCheck_$(Get-Date -Format 'yyyyMMdd').csv"
 ```
 
-### Full analysis with all defaults
+### Full analysis with default SKU discovery
 
 ```powershell
 .\Show-AzVMQuotaReport.ps1 -OutputFile "CompleteQuotaAnalysis.csv"
@@ -104,7 +105,8 @@ Running the script produces both console output and a CSV file:
 
 ### Console output
 ```plaintext
-Downloading VM SKU Details
+Querying Azure Catalogs API for VM SKU details in eastus
+Retrieved 412 unique VM SKUs from Catalogs API
 Listing Subscriptions
 Processing subscription: Development (12345678-abcd-1234-5678-123456789012)
   Analyzing location: eastus
@@ -158,18 +160,25 @@ This is expected behavior for the single-threaded version. For faster processing
 .\Get-AzVMQuotaUsage.ps1 -Threads 4
 ```
 
-### No SKU data returned
+### Catalogs API returns no SKU data
+
+The script now uses the Catalogs API as the primary SKU source. If SKU discovery fails:
 
 ```powershell
-# Verify the region supports the SKU
-Get-AzComputeResourceSku -Location 'eastus' |
-    Where-Object {$_.Name -eq 'Standard_D2s_v5'}
+# Verify the selected catalog location
+Get-AzLocation | Where-Object Location -eq 'eastus'
 
-# Check if meter data download succeeded
-Test-Path "AutofitComboMeterData.csv"
+# Verify the Catalogs API permission is available
+Get-AzRoleAssignment |
+    Where-Object { $_.RoleDefinitionName -like '*Reader*' }
 ```
 
-### Authentication errors
+If you already know the SKU names, pass them with `-SKUs` to skip catalog discovery.
+
+### Authentication or permission errors
+
+Catalog lookup requires an authenticated Az session and the `Microsoft.Capacity/catalogs/read`
+permission in addition to subscription read access.
 
 ```powershell
 # Clear and re-authenticate
@@ -178,6 +187,20 @@ Connect-AzAccount -Tenant 'your-tenant-id'
 
 # Verify current context
 Get-AzContext | Select-Object Account, Subscription, Tenant
+```
+
+If the script reports an authorization failure from the Catalogs API, ask your Azure administrator
+to grant access that includes `Microsoft.Capacity/catalogs/read`.
+
+### CSV fallback behavior
+
+If the Catalogs API lookup fails and you do not pass `-SKUs`, the script falls back to the
+deprecated meter data CSV source. That fallback helps older workflows continue, but it may not
+include the latest SKU catalog changes.
+
+```powershell
+# Check whether the default local fallback CSV exists after a failed Catalogs API lookup
+Test-Path "AutofitComboMeterData.csv"
 ```
 
 ### Empty zones data
@@ -213,7 +236,7 @@ For production use with large subscription counts, use Get-AzVMQuotaUsage.ps1 wh
 
 ## Script source
 
-[View full script source →](https://github.com/MSBrett/azcapman/blob/main/scripts/quota/Show-AzVMQuotaReport.ps1)
+[View full script source →](https://github.com/microsoft/azcapman/blob/main/scripts/quota/Show-AzVMQuotaReport.ps1)
 
 ## Related scripts
 

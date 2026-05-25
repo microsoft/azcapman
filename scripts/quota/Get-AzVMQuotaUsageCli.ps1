@@ -4,10 +4,10 @@
 <#
 .SYNOPSIS
     Multi-threaded Azure VM quota analysis script that queries compute resource SKU availability,
-    quota usage, and availability zone restrictions across subscriptions.
+    quota usage, and availability zone restrictions across subscriptions using Azure CLI.
 
 .DESCRIPTION
-    This script analyzes Azure VM quota usage and availability zone restrictions across multiple 
+    This script analyzes Azure VM quota usage and availability zone restrictions across multiple
     subscriptions and regions. It provides detailed information about:
     - Current quota usage vs. limits for VM families
     - Available and restricted availability zones per SKU
@@ -19,6 +19,9 @@
 
     The script supports multi-threading for faster execution across large numbers of subscriptions
     and can normalize zone information to physical zones for cross-subscription deployment planning.
+
+    This is the Azure CLI variant of Get-AzVMQuotaUsage.ps1. It uses `az` commands exclusively
+    and does not require the Azure PowerShell (Az) module.
 
 .PARAMETER SKUs
     Array of VM SKU names to analyze. If not specified, resolves VM SKUs from the Azure Catalogs
@@ -53,17 +56,18 @@
     Name of the output CSV file containing the analysis results.
 
 .EXAMPLE
-    .\Get-AzVMQuotaUsage.ps1 -SKUs @('Standard_D2s_v5','Standard_E4s_v5') -Locations @('eastus','westus2')
-    
+    .\Get-AzVMQuotaUsageCli.ps1 -SKUs @('Standard_D2s_v5','Standard_E4s_v5') -Locations @('eastus','westus2')
+
     Analyzes specific VM SKUs in specific regions across all accessible subscriptions.
 
 .EXAMPLE
-    .\Get-AzVMQuotaUsage.ps1 -UsePhysicalZones -Threads 4 -OutputFile "MyQuotaAnalysis.csv"
-    
+    .\Get-AzVMQuotaUsageCli.ps1 -UsePhysicalZones -Threads 4 -OutputFile "MyQuotaAnalysis.csv"
+
     Runs full analysis with physical zone mapping using 4 threads.
 
 .NOTES
-    Requires Azure PowerShell module and authenticated session with Reader access to target subscriptions.
+    Requires Azure CLI (`az`) installed and an authenticated session (`az login`) with Reader
+    access to target subscriptions. The Az PowerShell module is not required.
     Catalogs API access also requires the Microsoft.Capacity/catalogs/read permission.
     Output CSV contains columns: TenantId, SubscriptionId, SubscriptionName, Location, Family, Size,
     RegionRestricted, ZonesPresent, ZonesRestricted, CoresUsed, CoresTotal, CoresRequested, ZonesRequested
@@ -151,12 +155,12 @@ function Get-SKUDetails {
 
 <#
 .SYNOPSIS
-    Retrieves VM catalog data from the Azure Microsoft.Capacity catalogs API.
+    Retrieves VM catalog data from the Azure Microsoft.Capacity catalogs API using Azure CLI.
 
 .DESCRIPTION
     Calls the Azure catalogs endpoint for VirtualMachines in the specified subscription
-    and location using Invoke-AzRestMethod. Follows any nextLink values until all pages
-    are retrieved and returns only entries that contain the required instance size
+    and location using `az rest`. Follows any nextLink values until all pages are
+    retrieved and returns only entries that contain the required instance size
     flexibility properties.
 
 .PARAMETER SubscriptionId
@@ -175,20 +179,16 @@ function Get-VMCatalogData {
     )
 
     $catalogItems = [System.Collections.Generic.List[object]]::new()
-    $path = "/subscriptions/{0}/providers/Microsoft.Capacity/catalogs?api-version=2022-11-01&reservedResourceType=VirtualMachines&location={1}" -f $SubscriptionId, $Location
-    $nextLink = $null
+
+    # Get the resource manager endpoint for the current cloud (supports sovereign clouds)
+    $resourceManagerUrl = (az cloud show --query endpoints.resourceManager -o tsv).TrimEnd('/')
+
+    $uri = "{0}/subscriptions/{1}/providers/Microsoft.Capacity/catalogs?api-version=2022-11-01&reservedResourceType=VirtualMachines&location={2}" -f $resourceManagerUrl, $SubscriptionId, $Location
 
     do {
-        $response = if ([string]::IsNullOrWhiteSpace($nextLink)) {
-            Invoke-AzRestMethod -Method GET -Path $path
-        }
-        else {
-            Invoke-AzRestMethod -Method GET -Uri $nextLink
-        }
+        $response = az rest --method GET --url $uri -o json | ConvertFrom-Json
 
-        $payload = $response.Content | ConvertFrom-Json -Depth 10
-
-        foreach ($item in @($payload.value)) {
+        foreach ($item in @($response.value)) {
             $groupProperty = @($item.skuProperties | Where-Object { $_.name -eq 'ReservationsAutofitGroup' } | Select-Object -First 1)
             $ratioProperty = @($item.skuProperties | Where-Object { $_.name -eq 'ReservationsAutofitRatio' } | Select-Object -First 1)
 
@@ -207,26 +207,33 @@ function Get-VMCatalogData {
                 })
         }
 
-        $nextLink = $payload.nextLink
-    } while (-not [string]::IsNullOrWhiteSpace($nextLink))
+        $uri = $response.nextLink
+    } while (-not [string]::IsNullOrWhiteSpace($uri))
 
     return $catalogItems.ToArray()
 }
 
 <#
 .SYNOPSIS
-    Retrieves all accessible subscription IDs within the current tenant.
+    Retrieves all accessible subscription IDs within the current tenant using Azure CLI.
 
 .DESCRIPTION
     Gets all Azure subscriptions that the current authenticated user has access to
-    within the current tenant context.
+    within the current tenant context. Uses `az account list` filtered by the current
+    tenant ID obtained from `az account show`.
 
 .OUTPUTS
     Array of subscription ID strings
 #>
 function Get-SubscriptionIds {
     Write-Host "Listing Subscriptions"
-    return (Get-AzSubscription -TenantId ((Get-AzContext).Tenant.TenantId) | Select-Object -ExpandProperty SubscriptionId)
+
+    # Get the current tenant ID from the active CLI session
+    $tenantId = az account show --query tenantId -o tsv
+
+    # List all subscriptions in this tenant and return their IDs
+    $subscriptions = az account list --query "[?tenantId=='$tenantId'].id" -o json | ConvertFrom-Json
+    return $subscriptions
 }
 
 <#
@@ -247,7 +254,7 @@ function Get-LastChar {
     param (
         [string]$inputString
     )
-    
+
     if ([string]::IsNullOrEmpty($inputString)) {
         return ""
     }
@@ -256,24 +263,29 @@ function Get-LastChar {
 
 <#
 .SYNOPSIS
-    Retrieves all physical Azure regions.
+    Retrieves all physical Azure regions using Azure CLI.
 
 .DESCRIPTION
     Gets all Azure regions that are physical locations (not logical regions)
-    and have a defined physical location. Filters out logical regions and
-    regions without physical presence.
+    and have a defined physical location. Uses `az account list-locations` with
+    a JMESPath query to filter out logical regions and regions without physical presence.
 
 .OUTPUTS
     Array of Azure region names (e.g., 'eastus', 'westus2', 'centralus')
 #>
 function Get-Locations {
     Write-Host "Listing Locations"
-    return (Get-AzLocation | Where-Object { $_.RegionType -eq 'Physical' -and $_.PhysicalLocation -ne "" -and $_.Location } | Select-Object -Property Location -Unique).Location
+
+    # Query physical regions only — exclude logical regions and those without a physical location.
+    # The Az module equivalent filters on RegionType == 'Physical' and PhysicalLocation != ''.
+    # az account list-locations exposes this via metadata.regionType and metadata.physicalLocation.
+    $locations = az account list-locations --query "[?metadata.regionType=='Physical' && metadata.physicalLocation!=''].name" -o json | ConvertFrom-Json
+    return $locations
 }
 
 <#
 .SYNOPSIS
-    Retrieves availability zone peering information for a subscription.
+    Retrieves availability zone peering information for a subscription using Azure CLI.
 
 .DESCRIPTION
     Gets the logical-to-physical availability zone mappings for all regions
@@ -287,31 +299,43 @@ function Get-Locations {
     Array of location objects containing availability zone mapping details.
 
 .NOTES
-    Uses the Azure REST API directly as this information is not available through
-    standard PowerShell cmdlets.
+    Uses the Azure REST API via `az rest` as this information is not available through
+    standard Azure CLI commands. The resource manager endpoint is obtained from `az cloud show`.
 #>
 function Get-ZonePeers {
     param (
         [string]$SubscriptionId
     )
     Write-Host "Get Zone Peering Information for subscription $SubscriptionId"
-    
+
+    # Get the resource manager endpoint for the current cloud (supports sovereign clouds)
+    # TrimEnd('/') ensures sovereign clouds (AzureUSGovernment, AzureChinaCloud) that omit
+    # a trailing slash don't produce a malformed URI like "https://...netsubscriptions/..."
+    $resourceManagerUrl = (az cloud show --query endpoints.resourceManager -o tsv).TrimEnd('/')
+
     # Construct REST API URI for location zone mappings
-    $uri = "{0}subscriptions/{1}/locations?api-version=2022-12-01" -f (Get-AzContext).Environment.ResourceManagerUrl, $SubscriptionId
-    
-    # Call Azure REST API to get zone peering data
-    $response = Invoke-AzRest -Method GET -Uri $uri
-    return ($response.Content | ConvertFrom-Json).value
+    $uri = "${resourceManagerUrl}/subscriptions/${SubscriptionId}/locations?api-version=2022-12-01"
+
+    # Call Azure REST API to get zone peering data; pass --subscription to avoid context issues
+    $response = az rest --method GET --url $uri --subscription $SubscriptionId -o json | ConvertFrom-Json
+    return $response.value
 }
 
 <#
 .SYNOPSIS
-    Analyzes VM quota usage and restrictions for a specific subscription.
+    Analyzes VM quota usage and restrictions for a specific subscription using Azure CLI.
 
 .DESCRIPTION
     Core function that performs detailed quota analysis for a single subscription.
     Queries compute resource SKUs, VM usage statistics, and availability zone
-    restrictions across specified locations and SKUs.
+    restrictions across specified locations and SKUs using `az` CLI commands.
+
+    Unlike the Az module variant, this function passes --subscription to each
+    az command rather than calling az account set, which avoids race conditions
+    when running in parallel across multiple subscriptions.
+
+    UsePhysicalZones is accepted as a parameter (not inherited from script scope)
+    so that parallel runspaces can correctly receive the switch value via $using:.
 
 .PARAMETER SubscriptionId
     The Azure subscription ID to analyze.
@@ -331,29 +355,36 @@ function Get-ZonePeers {
 .NOTES
     This function is designed to run in parallel across multiple subscriptions
     for optimal performance. Each execution handles one subscription completely.
+    Pass --subscription to every az command; do not use az account set inside
+    parallel runspaces as it is process-global and causes race conditions.
 #>
 function Get-QuotaDetails {
     param (
         [string]$SubscriptionId,
         [string[]]$Locations,
         [string[]]$SKUs,
-        [string]$OutputFile
+        [string]$OutputFile,
+        [bool]$UsePhysicalZones = $false
     )
 
     $start = Get-Date
     try {
-        # Get subscription details and validate access
-        $Subscription = Get-AzSubscription -SubscriptionId $SubscriptionId -WarningAction SilentlyContinue
-        if ($null -eq $Subscription) {
+        # Get subscription details and validate access using Azure CLI.
+        # Pass --subscription so we never change the global az context.
+        $subscriptionJson = az account show --subscription $SubscriptionId -o json 2>$null | ConvertFrom-Json
+        if ($null -eq $subscriptionJson) {
             throw "Subscription not found"
         }
 
-        # Set context to target subscription for all subsequent queries
-        Set-AzContext -SubscriptionId $Subscription.Id -WarningAction SilentlyContinue | Out-Null
+        # Build a subscription object with the same field names used throughout the function
+        $Subscription = [PSCustomObject]@{
+            Id     = $subscriptionJson.id
+            Name   = $subscriptionJson.name
+            TenantId = $subscriptionJson.tenantId
+        }
 
         # Get zone peering information if physical zone mapping is requested
-        if($UsePhysicalZones)
-        {
+        if ($UsePhysicalZones) {
             $zonePeers = Get-ZonePeers -SubscriptionId $SubscriptionId
             if ($zonePeers.Count -eq 0) {
                 Write-Host "No Zone Peering Information found for subscription $SubscriptionId" -ForegroundColor Yellow
@@ -363,76 +394,88 @@ function Get-QuotaDetails {
         # Process each location within the subscription
         foreach ($Location in $Locations) {
             "Querying: $SubscriptionId - $($Subscription.Name) - $Location"
-            
-            # Get all VM SKUs available in this location
-            $computeSKUs = Get-AzComputeResourceSku -Location $Location -ErrorAction SilentlyContinue | Where-Object { $_.ResourceType -eq 'virtualMachines' }
-            
-            # Get current VM quota usage for this location
-            $vmUsage = Get-AZVMUsage -Location $Location -ErrorAction SilentlyContinue
-            
+
+            # Get all VM SKUs available in this location using Azure CLI.
+            # az vm list-skus returns objects where resourceType is lowercase.
+            $computeSKUs = az vm list-skus --location $Location --resource-type virtualMachines --subscription $SubscriptionId -o json 2>$null | ConvertFrom-Json
+
+            # Get current VM quota usage for this location using Azure CLI.
+            # Returns objects with currentValue, limit, and name.value / name.localizedValue.
+            $vmUsage = az vm list-usage --location $Location --subscription $SubscriptionId -o json 2>$null | ConvertFrom-Json
+
             # Get availability zone mappings for this location (if using physical zones)
-            $availabilityZoneMappings = ($zonePeers | Where-Object { $_.name -like $Location -and $_.type -eq "Region"}).availabilityZoneMappings
-            
+            $availabilityZoneMappings = ($zonePeers | Where-Object { $_.name -like $Location -and $_.type -eq "Region" }).availabilityZoneMappings
+
             # Process each requested SKU
             foreach ($SKU in $SKUs) {
-                # Find the specific SKU data for this location
-                $filteredSku = $computeSKUs | Where-Object { $_.Name.ToLowerInvariant() -eq $SKU.ToLowerInvariant() -and $_.LocationInfo.Location -like $Location }
-                
-                # Find the quota usage data for this SKU's family
-                $skuUsage = $vmUsage | Select-Object -ExpandProperty Name -Property CurrentValue, Limit | Where-Object { $_.Value -eq $filteredSku.Family }
-                
+                # Find the specific SKU data for this location.
+                # az vm list-skus locationInfo is an array; check locationInfo[0].location.
+                $filteredSku = $computeSKUs | Where-Object {
+                    $_.name.ToLowerInvariant() -eq $SKU.ToLowerInvariant() -and
+                    $_.locationInfo.Count -gt 0 -and
+                    $_.locationInfo[0].location -like $Location
+                }
+
                 # Skip if SKU not found in this location
-                if ($null -eq $filteredSku ) {
+                if ($null -eq $filteredSku) {
                     continue
                 }
+
+                # Find the quota usage data for this SKU's family.
+                # In az vm list-usage output: name.value holds the family identifier (e.g. standardDSv5Family)
+                # and name.localizedValue holds the human-readable label.
+                $skuUsage = $vmUsage | Where-Object { $_.name.value -eq $filteredSku.family }
 
                 # Skip if quota usage data not found
                 if ($null -eq $skuUsage) {
                     continue
                 }
 
-                # Process availability zones (logical or physical)
-                $zones = @($filteredSku.LocationInfo.Zones)
-                if($UsePhysicalZones)
-                {
+                # Process availability zones (logical or physical).
+                # az vm list-skus stores zones in locationInfo[0].zones.
+                # Guard against empty locationInfo to avoid index-out-of-bounds on SKUs
+                # that have no location info entries (returns empty array instead of throwing).
+                $zones = if ($filteredSku.locationInfo.Count -gt 0) { @($filteredSku.locationInfo[0].zones) } else { @() }
+                if ($UsePhysicalZones) {
                     # Convert logical zones to physical zones
                     for ($i = 0; $i -lt $zones.Length; $i++) {
-                        $zones[$i] = Get-LastChar(($availabilityZoneMappings | Where-Object {$_.LogicalZone -like $zones[$i]}).physicalZone)
+                        $zones[$i] = Get-LastChar(($availabilityZoneMappings | Where-Object { $_.LogicalZone -like $zones[$i] }).physicalZone)
                     }
                 }
-                
+
                 # Create the quota analysis object
                 $auditedSku = [PSCustomObject]@{
                     TenantId         = $Subscription.TenantId
                     SubscriptionId   = $Subscription.Id
                     SubscriptionName = $Subscription.Name
                     Location         = $Location
-                    Family           = $skuUsage.LocalizedValue          # VM family name (e.g., "Dv3 Family vCPUs")
-                    Size             = $filteredSku.Name                 # Specific SKU (e.g., "Standard_D2s_v3")
-                    RegionRestricted = 'False'                          # Whether SKU is restricted in this entire region
-                    ZonesPresent     = ($zones | Sort-Object) -join ","  # Available zones for this SKU
-                    ZonesRestricted  = ''                               # Zones where SKU is restricted
-                    CoresUsed        = $skuUsage.CurrentValue           # Current quota usage
-                    CoresTotal       = $skuUsage.Limit                  # Total quota limit
-                    CoresRequested   = ''                               # Placeholder for future use
-                    ZonesRequested  = ''                                # Placeholder for future use
+                    Family           = $skuUsage.name.localizedValue  # VM family name (e.g., "Dv3 Family vCPUs")
+                    Size             = $filteredSku.name               # Specific SKU (e.g., "Standard_D2s_v3")
+                    RegionRestricted = 'False'                         # Whether SKU is restricted in this entire region
+                    ZonesPresent     = ($zones | Sort-Object) -join "," # Available zones for this SKU
+                    ZonesRestricted  = ''                              # Zones where SKU is restricted
+                    CoresUsed        = $skuUsage.currentValue          # Current quota usage
+                    CoresTotal       = $skuUsage.limit                 # Total quota limit
+                    CoresRequested   = ''                              # Placeholder for future use
+                    ZonesRequested   = ''                              # Placeholder for future use
                 }
 
-                # Process any restrictions on this SKU
-                foreach ($restriction in $filteredSku.Restrictions) {
-                    if ($restriction.Type -like "Zone") {
-                        # Handle zone-specific restrictions
-                        $zoneRestrictions = @($restriction.RestrictionInfo.Zones)
-                        if($UsePhysicalZones)
-                        {
+                # Process any restrictions on this SKU.
+                # az vm list-skus restrictions[].type is lowercase (e.g. "Zone", "Location").
+                foreach ($restriction in $filteredSku.restrictions) {
+                    if ($restriction.type -like "Zone") {
+                        # Handle zone-specific restrictions.
+                        # az vm list-skus stores restricted zones in restrictionInfo.zones.
+                        $zoneRestrictions = @($restriction.restrictionInfo.zones)
+                        if ($UsePhysicalZones) {
                             # Convert restricted logical zones to physical zones
                             for ($i = 0; $i -lt $zoneRestrictions.Length; $i++) {
-                                $zoneRestrictions[$i] = Get-LastChar(($availabilityZoneMappings | Where-Object {$_.LogicalZone -like $zoneRestrictions[$i]}).physicalZone)
+                                $zoneRestrictions[$i] = Get-LastChar(($availabilityZoneMappings | Where-Object { $_.LogicalZone -like $zoneRestrictions[$i] }).physicalZone)
                             }
                         }
                         $auditedSku.ZonesRestricted = ($zoneRestrictions | Sort-Object) -join ","
                     }
-                    elseif ($restriction.Type -like "Location") {
+                    elseif ($restriction.type -like "Location") {
                         # Handle region-wide restrictions
                         $auditedSku.RegionRestricted = 'True'
                     }
@@ -466,20 +509,11 @@ $begin = Get-Date
 # Define CSV header structure for output file
 $csvHeaderString = "TenantId,SubscriptionId,SubscriptionName,Location,Family,Size,RegionRestricted,ZonesPresent,ZonesRestricted,CoresUsed,CoresTotal,CoresRequested,ZonesRequested"
 
-# Auto-detect optimal thread count if not specified
-if($Threads -eq 0)
-{
+# Auto-detect optimal thread count if not specified.
+# Uses [Environment]::ProcessorCount (cross-platform) instead of WMI (Windows-only).
+if ($Threads -eq 0) {
     try {
-        # Use WMI to detect CPU configuration
-        $spec = Get-WmiObject -Class Win32_Processor | Select-Object -Property NumberOfCores, NumberOfLogicalProcessors
-        if($spec.NumberOfLogicalProcessors -gt $spec.NumberOfCores) {
-            # Hyper-threading enabled: Use physical cores to avoid e-core performance issues
-            $Threads = $spec.NumberOfLogicalProcessors - $spec.NumberOfCores
-        }
-        else {
-            # Hyper-threading disabled: Use all available cores
-            $Threads = $spec.NumberOfCores
-        }
+        $Threads = [Math]::Max(1, [Environment]::ProcessorCount / 2)
     }
     catch {
         # Fallback to single-threaded if CPU detection fails
@@ -487,7 +521,7 @@ if($Threads -eq 0)
     }
 }
 
-# Populate subscription list if not provided  
+# Populate subscription list if not provided
 if ($SubscriptionIds.Count -eq 0) {
     $SubscriptionIds = Get-SubscriptionIds
 }
@@ -505,8 +539,7 @@ if ($SKUs.Count -eq 0) {
 }
 
 # Display configuration information
-if($UsePhysicalZones)
-{
+if ($UsePhysicalZones) {
     Write-Host "Output will be normalized to physical availability zones"
 }
 else {
@@ -515,33 +548,42 @@ else {
 
 Write-Host "Querying $($SubscriptionIds.Count) subscriptions with $($SKUs.Count) SKUs in $($Locations.Count) locations using $Threads threads"
 
-# Execute quota analysis using parallel processing
+# Execute quota analysis using parallel processing.
+# Function definition is serialized as a string and re-imported in each runspace,
+# because parallel runspaces do not inherit the calling scope's function definitions.
+# IMPORTANT: az account set is NOT used inside the parallel block. Every az command
+# receives --subscription explicitly to avoid process-global context race conditions.
 $funcDef = ${function:Get-QuotaDetails}.ToString()
+$lastCharFuncDef = ${function:Get-LastChar}.ToString()
+$getZonePeersFuncDef = ${function:Get-ZonePeers}.ToString()
+
 $SubscriptionIds | Foreach-Object -ThrottleLimit $Threads -Parallel {
-    # Import function definition into parallel runspace
+    # Import all required function definitions into the parallel runspace
     ${function:Get-QuotaDetails} = $using:funcDef
-    
-    # Use separate output files for multi-threaded execution to avoid conflicts
-    if($USING:Threads -gt 1) { 
-        $outFile = "QuotaQuery_{0}.csv" -f $PSItem 
-    } else { 
-        $outFile = $USING:OutputFile 
+    ${function:Get-LastChar} = $using:lastCharFuncDef
+    ${function:Get-ZonePeers} = $using:getZonePeersFuncDef
+
+    # Use separate output files for multi-threaded execution to avoid write conflicts
+    if ($USING:Threads -gt 1) {
+        $outFile = "QuotaQuery_{0}.csv" -f $PSItem
+    } else {
+        $outFile = $USING:OutputFile
     }
-    
+
     # Write CSV header to output file
     $USING:csvHeaderString | Out-File -Force $outFile
-    
+
     # Execute quota analysis for this subscription
-    Get-QuotaDetails -SubscriptionId $_ -Locations $USING:Locations -SKUs $USING:SKUs -outputFile $outFile
+    Get-QuotaDetails -SubscriptionId $_ -Locations $USING:Locations -SKUs $USING:SKUs -OutputFile $outFile -UsePhysicalZones ([bool]$USING:UsePhysicalZones)
 }
 
 # Merge multiple CSV files if multi-threaded execution was used
-if($Threads -gt 1) {
+if ($Threads -gt 1) {
     Write-Host "Merging CSV files"
-    
+
     # Create consolidated output file with header
     $csvHeaderString | Out-File -Force -FilePath $OutputFile
-    
+
     # Append content from all thread-specific files (skipping headers)
     Get-ChildItem -Path .\QuotaQuery_*.csv | ForEach-Object {
         Get-Content $_.FullName | Select-Object -Skip 1 | Add-Content $OutputFile

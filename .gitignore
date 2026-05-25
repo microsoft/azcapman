@@ -1,13 +1,14 @@
 # Generated script output files
 QuotaQuery_*.csv
 QuotaQuery.csv
+isfratioblob.csv
 AutofitComboMeterData.csv
 ZonePeers.csv
 QuotaQuery*.pbix
 
 # Development tools
 .vscode/
-.cluade/
+.claude/
 .playwright-mcp/
 CLAUDE.md
 AGENTS.md
@@ -67,5 +68,7 @@ out/
 vbd/
 PRD.md
 RETROSPECTIVES.md
+RTM.md
 TODO.md
 opencode.*
+.gate/

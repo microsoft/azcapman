@@ -6,12 +6,12 @@ has_children: true
 
 # Capacity management overview
 
-Use this section to access subscription lifecycle guides, capacity and quota guidance, and supporting operational references. The goal is to connect estate-level controls to Azure landing zone and Well-Architected guidance without prescribing your internal operating model. [Source](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/isv-landing-zone) [Source](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning)
+Use this section to access subscription lifecycle guides, capacity and quota guidance, and supporting operational references. The goal is to connect estate-level Azure controls to Azure landing zone, Well-Architected, and FinOps Framework guidance without prescribing your internal operating model. [Source](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/isv-landing-zone) [Source](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning) [Source](https://www.finops.org/framework/)
 
-- [Forecast](capacity-planning/README.md)—capacity planning inputs, isolation decisions, and the demand signals you use before you source quota or commitments.
-- [Procure](quota/README.md)—billing scopes, region and zonal access, quota requests, and capacity reservations.
-- [Allocate](quota-groups/README.md)—pooled quota distribution through quota groups and management group controls.
-- [Monitor](monitoring-alerting/README.md)—quota and reservation monitoring, alerting, governance gates, and support references.
+- [Planning and forecasting](capacity-planning/README.md)—capacity planning inputs, isolation decisions, and demand signals for Planning & Estimating and Forecasting.
+- [Workload placement](quota/README.md)—billing scopes, region and zonal access, quota requests, SKU readiness, and capacity reservation constraints for Architecting & Workload Placement.
+- [Usage and rate optimization](quota-groups/README.md)—quota groups, capacity reservations, and pricing-commitment coordination for Usage Optimization and Rate Optimization.
+- [Governance and automation](monitoring-alerting/README.md)—quota and reservation monitoring, alerting, governance gates, and support references for Governance, Policy & Risk and Automation, Tools & Services.
 
 ## Subscription vending context
 

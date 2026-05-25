@@ -15,16 +15,16 @@ This matrix lists external links used across the documentation, along with the f
 | <https://azure.microsoft.com/en-us/pricing/calculator/> | Azure Pricing Calculator | docs/billing/modern/README.md |
 | <https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/> | Azure pricing by region | docs/operations/capacity-reservations/README.md |
 | <https://focus.finops.org/> | FOCUS schema | docs/operations/glossary.md |
-| <https://github.com/MSBrett/azcapman/blob/main/scripts/anomaly-alerts/Deploy-AnomalyAlert.ps1> | View full script source → | docs/operations/tools-scripts/deploy-anomalyalert.md |
-| <https://github.com/MSBrett/azcapman/blob/main/scripts/anomaly-alerts/Deploy-BulkALZ.ps1> | View full script source → | docs/operations/tools-scripts/deploy-bulkalz.md |
-| <https://github.com/MSBrett/azcapman/blob/main/scripts/anomaly-alerts/anomaly-alert.bicep> | anomaly-alert.bicep | docs/operations/tools-scripts/deploy-anomalyalert.md, docs/operations/tools-scripts/deploy-bulkalz.md |
-| <https://github.com/MSBrett/azcapman/blob/main/scripts/quota/Get-AzAvailabilityZoneMapping.ps1> | View full script source → | docs/operations/tools-scripts/get-azavailabilityzonemapping.md |
-| <https://github.com/MSBrett/azcapman/blob/main/scripts/quota/Get-AzVMQuotaUsage.ps1> | View full script source → | docs/operations/tools-scripts/get-azvmquotausage.md |
-| <https://github.com/MSBrett/azcapman/blob/main/scripts/quota/Show-AzVMQuotaReport.ps1> | View full script source → | docs/operations/tools-scripts/show-azvmquotareport.md |
-| <https://github.com/MSBrett/azcapman/blob/main/scripts/rate/Get-BenefitRecommendations.ps1> | View full script source → | docs/operations/tools-scripts/get-benefitrecommendations.md |
-| <https://github.com/MSBrett/azcapman/tree/main/scripts> | GitHub repository | docs/operations/tools-scripts/README.md |
-| <https://github.com/MSBrett/azcapman/tree/main/scripts/advisor> | Suppress-AdvisorRecommendations.ps1 | docs/operations/tools-scripts/README.md |
-| <https://github.com/MSBrett/azcapman/tree/main/scripts/quota> | `Get-AzVMQuotaUsage.ps1` | docs/operations/quota/README.md |
+| <https://github.com/microsoft/azcapman/blob/main/scripts/anomaly-alerts/Deploy-AnomalyAlert.ps1> | View full script source → | docs/operations/tools-scripts/deploy-anomalyalert.md |
+| <https://github.com/microsoft/azcapman/blob/main/scripts/anomaly-alerts/Deploy-BulkALZ.ps1> | View full script source → | docs/operations/tools-scripts/deploy-bulkalz.md |
+| <https://github.com/microsoft/azcapman/blob/main/scripts/anomaly-alerts/anomaly-alert.bicep> | anomaly-alert.bicep | docs/operations/tools-scripts/deploy-anomalyalert.md, docs/operations/tools-scripts/deploy-bulkalz.md |
+| <https://github.com/microsoft/azcapman/blob/main/scripts/quota/Get-AzAvailabilityZoneMapping.ps1> | View full script source → | docs/operations/tools-scripts/get-azavailabilityzonemapping.md |
+| <https://github.com/microsoft/azcapman/blob/main/scripts/quota/Get-AzVMQuotaUsage.ps1> | View full script source → | docs/operations/tools-scripts/get-azvmquotausage.md |
+| <https://github.com/microsoft/azcapman/blob/main/scripts/quota/Show-AzVMQuotaReport.ps1> | View full script source → | docs/operations/tools-scripts/show-azvmquotareport.md |
+| <https://github.com/microsoft/azcapman/blob/main/scripts/rate/Get-BenefitRecommendations.ps1> | View full script source → | docs/operations/tools-scripts/get-benefitrecommendations.md |
+| <https://github.com/microsoft/azcapman/tree/main/scripts> | GitHub repository | docs/operations/tools-scripts/README.md |
+| <https://github.com/microsoft/azcapman/tree/main/scripts/advisor> | Suppress-AdvisorRecommendations.ps1 | docs/operations/tools-scripts/README.md |
+| <https://github.com/microsoft/azcapman/tree/main/scripts/quota> | `Get-AzVMQuotaUsage.ps1` | docs/operations/quota/README.md |
 | <https://github.com/microsoft/finops-toolkit/blob/main/src/queries/INDEX.md> | FinOps Toolkit query index | docs/billing/modern/README.md, docs/operations/capacity-reservations/README.md |
 | <https://learn.microsoft.com/en-us/azure/advisor/advisor-cost-recommendations> | Azure Advisor rightsizing and shutdown recommendations use retail (pay-as-you-go) prices | docs/billing/modern/README.md |
 | <https://learn.microsoft.com/en-us/azure/advisor/advisor-workbook-cost-optimization> | Cost Optimization workbook | docs/operations/capacity-planning/README.md |
@@ -130,10 +130,10 @@ This matrix lists external links used across the documentation, along with the f
 | <https://learn.microsoft.com/en-us/azure/well-architected/saas/data> | transactional data stores | docs/deployment/multi-tenant/README.md, docs/deployment/single-tenant/README.md |
 | <https://learn.microsoft.com/en-us/azure/well-architected/saas/design-principles> | tenant experience | docs/deployment/multi-tenant/README.md |
 | <https://learn.microsoft.com/en-us/cli/azure/quota?view=azure-cli-latest> | quota audits | docs/operations/capacity-reservations/README.md, docs/operations/monitoring-alerting/README.md, docs/operations/non-compute-quotas/README.md, docs/operations/quota/README.md |
-| <https://learn.microsoft.com/en-us/cloud-computing/finops/framework/> | FinOps Framework | docs/operations/capacity-and-quotas/README.md, docs/operations/glossary.md |
-| <https://learn.microsoft.com/en-us/cloud-computing/finops/framework/optimize/rates> | rate optimization capability | docs/billing/modern/README.md |
-| <https://learn.microsoft.com/en-us/cloud-computing/finops/framework/optimize/rates#getting-started> | FinOps rate optimization | docs/operations/capacity-and-quotas/README.md, docs/operations/capacity-governance/README.md, docs/operations/glossary.md, docs/operations/monitoring-alerting/README.md |
-| <https://learn.microsoft.com/en-us/cloud-computing/finops/framework/quantify/planning> | FinOps Framework planning and estimating capability | docs/operations/capacity-planning/README.md |
+| <https://www.finops.org/framework/> | FinOps Framework | docs/operations/capacity-and-quotas/README.md, docs/operations/glossary.md |
+| <https://www.finops.org/framework/capabilities/rate-optimization/> | rate optimization capability | docs/billing/modern/README.md |
+| <https://www.finops.org/framework/capabilities/rate-optimization/> | FinOps rate optimization | docs/operations/capacity-and-quotas/README.md, docs/operations/capacity-governance/README.md, docs/operations/glossary.md, docs/operations/monitoring-alerting/README.md |
+| <https://www.finops.org/framework/capabilities/planning-estimating/> | FinOps Framework planning and estimating capability | docs/operations/capacity-planning/README.md |
 | <https://learn.microsoft.com/en-us/cloud-computing/finops/toolkit/hubs/finops-hubs-overview> | FinOps Hubs | docs/billing/modern/README.md, docs/deployment/single-tenant/README.md, docs/operations/capacity-planning/README.md, docs/operations/capacity-reservations/README.md, docs/operations/glossary.md |
 | <https://learn.microsoft.com/en-us/marketplace/azure-consumption-commitment-benefit> | Microsoft Azure Consumption Commitment (MACC) | docs/billing/modern/README.md |
 | <https://learn.microsoft.com/en-us/powershell/module/az.compute/get-azcomputeresourcesku> | `Get-AzComputeResourceSku` | docs/operations/quota/README.md |

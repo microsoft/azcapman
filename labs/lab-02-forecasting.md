@@ -179,7 +179,7 @@ Cross-check the API's recommendation against your capacity forecast from Exercis
 - If your forecast growth rate suggests 12% month-over-month increase, and the API recommends 85% coverage, you'll need a commitment increase in 2–3 months.
 - Schedule your next forecast refresh accordingly.
 
-Reference the [FinOps Framework planning and estimating guidance](https://learn.microsoft.com/en-us/cloud-computing/finops/framework/quantify/planning) for structuring this decision.
+Reference the [FinOps Framework planning and estimating guidance](https://www.finops.org/framework/capabilities/planning-estimating/) for structuring this decision.
 
 ---
 
@@ -458,4 +458,4 @@ The output of forecasting feeds directly into:
 - **Procurement timing:** When to renew savings plans or request capacity increases?
 - **Architecture reviews:** Are stamp capacities sized correctly, or is one region a bottleneck?
 
-For deeper guidance on the FinOps discipline around forecasting, refer to the [FinOps Framework planning and estimating section](https://learn.microsoft.com/en-us/cloud-computing/finops/framework/quantify/planning).
+For deeper guidance on the FinOps discipline around forecasting, refer to the [FinOps Framework planning and estimating section](https://www.finops.org/framework/capabilities/planning-estimating/).
