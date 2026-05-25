@@ -8,15 +8,15 @@ Invoke with `@azure-capacity-manager` in any Copilot Chat conversation.
 ## What it does
 
 The `@azure-capacity-manager` participant embeds the full azcapman domain knowledge as a bundled \
-system prompt. It covers the complete capacity supply chain for SaaS ISVs operating workloads in \
-ISV-owned Azure subscriptions under EA or MCA:
+system prompt. It maps Azure capacity evidence to FinOps Framework capabilities for SaaS ISVs \
+operating workloads in ISV-owned Azure subscriptions under EA or MCA:
 
-| Step | Coverage |
+| FinOps capability | Coverage |
 |------|---------|
-| Forecast | Demand modeling, scale unit sizing, FinOps budget alignment |
-| Procure | Region access, zonal enablement, quota increases, quota groups |
-| Allocate | Capacity reservation group design, cross-subscription sharing, overallocation |
-| Monitor | Quota alerts, budget alerts, anomaly detection, governance cadence |
+| Planning & Estimating and Forecasting | Demand modeling, scale unit sizing, budget alignment |
+| Architecting & Workload Placement | Region access, zonal enablement, SKU readiness, quota groups |
+| Usage Optimization and Rate Optimization | Capacity reservation group design, cross-subscription sharing, overallocation, pricing commitment coordination |
+| Governance, Policy & Risk and Automation, Tools & Services | Quota alerts, budget alerts, anomaly detection, governance evidence |
 
 ## Slash commands
 
@@ -71,7 +71,7 @@ Or drag the `.vsix` into the VS Code Extensions view.
 
 ## Reference documentation
 
-Full operational documentation is at https://msbrett.github.io/azcapman/ — the participant cites \
+Full operational documentation is at https://microsoft.github.io/azcapman/ — the participant cites \
 these pages in every response.
 
-Source repository: https://github.com/msbrett/azcapman
+Source repository: https://github.com/microsoft/azcapman
