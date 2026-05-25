@@ -35,7 +35,7 @@ Scripts that extend Azure's native capabilities for ISV capacity management.
 
 | Tool | Description |
 |------|-------------|
-| [Serverless SQL storage audit](https://github.com/MSBrett/azcapman/tree/main/scripts/serverless-sql-storage) | Azure Monitor workbook that surfaces allocated vs. used storage across Azure SQL serverless databases; identifies `DBCC SHRINKDATABASE` candidates to reclaim billing waste |
+| [Serverless SQL storage audit](https://github.com/microsoft/azcapman/tree/main/scripts/serverless-sql-storage) | Azure Monitor workbook that surfaces allocated vs. used storage across Azure SQL serverless databases; identifies `DBCC SHRINKDATABASE` candidates to reclaim billing waste |
 
 ## Advisor recommendations
 
@@ -47,6 +47,6 @@ Scripts that extend Azure's native capabilities for ISV capacity management.
 
 | Tool | Description |
 |------|-------------|
-| [calculator.py](https://github.com/MSBrett/azcapman/tree/main/scripts/calculator) | Python calculator using SymPy for safe evaluation of mathematical expressions from string input; designed for LLM tool use in cost and quota calculations |
+| [calculator.py](https://github.com/microsoft/azcapman/tree/main/scripts/calculator) | Python calculator using SymPy for safe evaluation of mathematical expressions from string input; designed for LLM tool use in cost and quota calculations |
 
-**Source**: [GitHub repository](https://github.com/MSBrett/azcapman/tree/main/scripts)
+**Source**: [GitHub repository](https://github.com/microsoft/azcapman/tree/main/scripts)

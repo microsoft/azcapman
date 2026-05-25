@@ -135,7 +135,7 @@ Verify the TTL hasn't expired. Suppressions older than `Days` are automatically 
 
 ## Script source
 
-[View full script source →](https://github.com/MSBrett/azcapman/tree/main/scripts/advisor)
+[View full script source →](https://github.com/microsoft/azcapman/tree/main/scripts/advisor)
 
 ## Related documentation
 

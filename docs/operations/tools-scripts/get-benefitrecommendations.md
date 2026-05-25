@@ -214,7 +214,7 @@ foreach ($sub in $subscriptions) {
 
 ## Script source
 
-[View full script source →](https://github.com/MSBrett/azcapman/blob/main/scripts/rate/Get-BenefitRecommendations.ps1)
+[View full script source →](https://github.com/microsoft/azcapman/blob/main/scripts/rate/Get-BenefitRecommendations.ps1)
 
 ## Related documentation
 

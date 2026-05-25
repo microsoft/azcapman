@@ -43,7 +43,7 @@ Here's what you'll need to get started:
 **Best for**: Large-scale analysis
 
 ```powershell
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MSBrett/azcapman/main/scripts/quota/Get-AzVMQuotaUsage.ps1" -OutFile "Get-AzVMQuotaUsage.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/microsoft/azcapman/main/scripts/quota/Get-AzVMQuotaUsage.ps1" -OutFile "Get-AzVMQuotaUsage.ps1"
 .\Get-AzVMQuotaUsage.ps1 -SKUs @('Standard_D2s_v5', 'Standard_E2s_v5') -Locations @('eastus', 'westus2') -Threads 4
 ```
 
@@ -84,7 +84,7 @@ What you'll get:
 **Best for**: Smaller analysis or learning
 
 ```powershell
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MSBrett/azcapman/main/scripts/quota/Show-AzVMQuotaReport.ps1" -OutFile "Show-AzVMQuotaReport.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/microsoft/azcapman/main/scripts/quota/Show-AzVMQuotaReport.ps1" -OutFile "Show-AzVMQuotaReport.ps1"
 .\Show-AzVMQuotaReport.ps1 -SKUs @('Standard_D2s_v5', 'Standard_E2s_v5') -Locations @('eastus', 'westus2')
 ```
 
@@ -111,7 +111,7 @@ This script provides:
 **Best for**: Cross-subscription deployment planning
 
 ```powershell
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MSBrett/azcapman/main/scripts/quota/Get-AzAvailabilityZoneMapping.ps1" -OutFile "Get-AzAvailabilityZoneMapping.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/microsoft/azcapman/main/scripts/quota/Get-AzAvailabilityZoneMapping.ps1" -OutFile "Get-AzAvailabilityZoneMapping.ps1"
 .\Get-AzAvailabilityZoneMapping.ps1 -SubscriptionIds @('sub1-id','sub2-id') -OutputFile "ZoneMappings.csv"
 ```
 
@@ -210,7 +210,7 @@ For issues with these scripts:
 
 ## Script versions
 
-These scripts are maintained in the [azcapman repository](https://github.com/MSBrett/azcapman). Check for updates regularly to get the latest features and bug fixes.
+These scripts are maintained in the [azcapman repository](https://github.com/microsoft/azcapman). Check for updates regularly to get the latest features and bug fixes.
 
 ---
 
