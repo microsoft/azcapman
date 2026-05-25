@@ -65,7 +65,7 @@ nav_order: 1
 ### Visibility through FinOps Hubs
 
 - Use [FinOps Hubs](https://learn.microsoft.com/en-us/cloud-computing/finops/toolkit/hubs/finops-hubs-overview) to monitor commitment discount utilization and realized savings across your estate; [FinOps Hubs requires deployment](https://learn.microsoft.com/en-us/cloud-computing/finops/toolkit/hubs/finops-hubs-overview) before queries are available.
-- The [rate optimization capability](https://learn.microsoft.com/en-us/cloud-computing/finops/framework/optimize/rates) in the FinOps Framework provides guidance on when to use reservations versus savings plans based on workload stability.
+- The [rate optimization capability](https://www.finops.org/framework/capabilities/rate-optimization/) in the FinOps Framework provides guidance on when to use reservations versus savings plans based on workload stability.
 - FinOps Hubs exposes commitment tracking queries documented in the [FinOps Toolkit query index](https://github.com/microsoft/finops-toolkit/blob/main/src/queries/INDEX.md).
 
 ### Capacity allocation as a rate optimization signal

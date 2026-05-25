@@ -6,9 +6,9 @@ nav_order: 1
 
 # Capacity planning framework
 
-Effective capacity planning combines historical usage analysis, forecasting, and scaling strategies so Azure workloads remain reliable without overspending. Use this framework to structure planning cycles and link outputs to quota and reservation decisions—you'll avoid surprises when demand spikes.
+Effective capacity planning combines historical usage analysis, forecasting, and scaling strategies so Azure workloads remain reliable without overspending, as described in [capacity planning in the Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning) and [reliable scaling guidance](https://learn.microsoft.com/en-us/azure/well-architected/reliability/scaling). Use this framework to structure planning cycles and link outputs to quota and reservation decisions, which aligns with [workload supply chain guidance](https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/workload-supply-chain).
 
-[Where this fits](../capacity-and-quotas/README.md): step 1 of the capacity journey. Forecast scale units or deployment stamps, then feed quota, region access, and reservation needs into the next steps. [Source](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning)
+[FinOps capability mapping](../capacity-and-quotas/README.md): Capacity planning supports Planning & Estimating and Forecasting by sizing scale units or deployment stamps, then exposing quota, region access, and reservation needs as capacity evidence. [Source](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning) [Source](https://www.finops.org/framework/capabilities/)
 
 ## Gather utilization data
 
@@ -19,7 +19,7 @@ Effective capacity planning combines historical usage analysis, forecasting, and
 ## Analyze existing workloads
 
 - [Identify peak utilization windows, transaction rates, and concurrency](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning#understand-an-existing-workload) to pinpoint components that approach their limits.
-- [Visualize metrics to highlight trends and anomalies](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning#understand-an-existing-workload); charts help stakeholders understand where bottlenecks have occurred or may emerge.
+- [Visualize metrics to highlight trends and anomalies](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning#understand-an-existing-workload); charts show operators where bottlenecks have occurred or may emerge.
 - [Map performance thresholds](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning#understand-an-existing-workload) (SLA targets, response time goals) to resource utilization to determine safe operating ranges.
 
 ## Plan for new workloads
@@ -31,6 +31,8 @@ Effective capacity planning combines historical usage analysis, forecasting, and
 
 - [Produce short-term (weekly/monthly) and long-term (quarterly/annual) projections](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning) using historical trends or scenario planning.
 - [Include confidence ranges and plan for both normal and surge conditions](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning) (for example, special events, regulatory deadlines).
+
+> **Boundary:** Forecasting improves readiness and procurement planning, but it doesn't guarantee regional or zonal service availability by itself. If a target region or zone is restricted for a subscription, submit a [region access request](https://learn.microsoft.com/en-us/troubleshoot/azure/general/region-access-request-process) and, where applicable, a [zonal enablement request](https://learn.microsoft.com/en-us/troubleshoot/azure/general/zonal-enablement-request-for-restricted-vm-series).
 
 ## Align scaling strategies
 
@@ -52,8 +54,8 @@ Effective capacity planning combines historical usage analysis, forecasting, and
 
 ## Incorporate rate optimization into capacity forecasts
 
-- Capacity planning must account for regional pricing differences—sourcing the same SKU in different regions has different cost implications for your COGS.
-- The [FinOps Framework planning and estimating capability](https://learn.microsoft.com/en-us/cloud-computing/finops/framework/quantify/planning) provides guidance on integrating cost projections with capacity needs.
+- Capacity planning must account for regional pricing differences, so include region-specific rate inputs in your forecast model using your billing and cost datasets ([FinOps Framework planning and estimating capability](https://www.finops.org/framework/capabilities/planning-estimating/), [FinOps Hubs overview](https://learn.microsoft.com/en-us/cloud-computing/finops/toolkit/hubs/finops-hubs-overview)).
+- The [FinOps Framework planning and estimating capability](https://www.finops.org/framework/capabilities/planning-estimating/) provides guidance on integrating cost projections with capacity needs.
 - Use the [Cost Optimization workbook](https://learn.microsoft.com/en-us/azure/advisor/advisor-workbook-cost-optimization) in Azure Advisor to identify reservation purchase recommendations aligned with your capacity forecasts.
 - When forecasting capacity for new regions, query historical pricing via [FinOps Hubs](https://learn.microsoft.com/en-us/cloud-computing/finops/toolkit/hubs/finops-hubs-overview) to project accurate unit costs.
 

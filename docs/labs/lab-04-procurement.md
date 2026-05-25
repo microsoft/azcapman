@@ -29,9 +29,11 @@ Use `Get-AzComputeResourceSku` to list available VM SKUs:
 
 ```powershell
 Get-AzComputeResourceSku `
-  -Location "eastus" `
-  -ResourceType "virtualMachines" |
-  Where-Object { $_.Name -eq "Standard_D4s_v5" } |
+  -Location "eastus" |
+  Where-Object {
+    $_.ResourceType -eq "virtualMachines" -and
+    $_.Name -eq "Standard_D4s_v5"
+  } |
   Select-Object Name, Locations, Restrictions
 ```
 

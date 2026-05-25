@@ -26,7 +26,7 @@ nav_order: 2
 - EA exposes a dedicated [**SubscriptionCreator** role](https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/assign-roles-azure-service-principals) for service principals so automation can create subscriptions at the account scope.
 - [Automating EA actions](https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/assign-roles-azure-service-principals) requires registering a Microsoft Entra application, capturing the service principal object ID, and assigning the desired EA role (for example, SubscriptionCreator or EnrollmentReader) via the EA REST API or PowerShell before calling subscription APIs.
 
-## Policy and governance
+## Governance, Policy & Risk
 
 - [Enrollment policies](https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/direct-ea-administration#view-and-manage-enrollment-policies) let administrators control who can create subscriptions (authorization levels: Microsoft Account only, Work/School only, cross-tenant) and whether dev/test offers are available to account owners.
 - [EA billing roles](https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/understand-ea-roles) must be assigned to individual identities (not groups) to ensure compliance and traceability; each user should have a monitored email for notifications so requests don't go unnoticed.

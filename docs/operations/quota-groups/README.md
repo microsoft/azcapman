@@ -6,7 +6,7 @@ nav_order: 5
 
 # Azure quota groups reference
 
-> Where this fits: step 2 of the capacity supply chain. Use quota groups after you unblock regions and zones so you can stage VM-family headroom for multiple subscriptions. [Source](https://learn.microsoft.com/en-us/azure/quotas/quota-groups)
+> FinOps capability mapping: Quota groups support Planning & Estimating, Forecasting, Architecting & Workload Placement, Usage Optimization, and Automation, Tools & Services by pooling eligible compute quota across subscriptions after region and zonal access are available. [Source](https://learn.microsoft.com/en-us/azure/quotas/quota-groups) [Source](https://www.finops.org/framework/capabilities/)
 
 [Azure quota groups](https://learn.microsoft.com/en-us/azure/quotas/quota-groups) are Azure Resource Manager (ARM) objects that let you share and self-manage compute quota across a set of subscriptions. This page aggregates key prerequisites, limitations, lifecycle behavior, and monitoring options from the official documentation so you can reason about quota groups alongside the other guides in this site, and you'll see where each Microsoft article fits.
 

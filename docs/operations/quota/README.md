@@ -8,7 +8,7 @@ nav_order: 4
 
 Use this guide when you're auditing or increasing Azure quotas so every request pulls from the same reference.
 
-[Where this fits](../capacity-and-quotas/README.md): step 2 of the capacity journey. Use it to unblock regions and zones and confirm VM-family limits before moving quota into groups or reserving capacity. [Source](https://learn.microsoft.com/en-us/troubleshoot/azure/general/region-access-request-process) [Source](https://learn.microsoft.com/en-us/troubleshoot/azure/general/zonal-enablement-request-for-restricted-vm-series)
+[FinOps capability mapping](../capacity-and-quotas/README.md): Quota, region access, zonal enablement, and SKU readiness support Architecting & Workload Placement, Planning & Estimating, Forecasting, and Governance, Policy & Risk. Use this guide to verify those Azure constraints before moving quota into groups or reserving capacity. [Source](https://learn.microsoft.com/en-us/troubleshoot/azure/general/region-access-request-process) [Source](https://learn.microsoft.com/en-us/troubleshoot/azure/general/zonal-enablement-request-for-restricted-vm-series) [Source](https://www.finops.org/framework/capabilities/)
 
 ## Understand default quotas and enforcement
 
@@ -44,7 +44,7 @@ When deployments fail because of offer restrictions, you'll encounter these erro
 
 ### Detect restrictions before deployment
 
-- Run [`Get-AzVMQuotaUsage.ps1`](https://github.com/MSBrett/azcapman/tree/main/scripts/quota) to check restrictions before deploying. The script outputs `RegionRestricted` (True/False indicating whether the SKU is blocked for the entire region) and `ZonesRestricted` (comma-separated list of logical zones where the SKU is unavailable) columns for each subscription and location.
+- Run [`Get-AzVMQuotaUsage.ps1`](https://github.com/microsoft/azcapman/tree/main/scripts/quota) to check restrictions before deploying. The script outputs `RegionRestricted` (True/False indicating whether the SKU is blocked for the entire region) and `ZonesRestricted` (comma-separated list of logical zones where the SKU is unavailable) columns for each subscription and location.
 - Use [`Get-AzComputeResourceSku`](https://learn.microsoft.com/en-us/powershell/module/az.compute/get-azcomputeresourcesku) directly to inspect the `Restrictions` property for specific SKUs, which exposes location and zone restrictions along with the reason code.
 - Always check restrictions before filing quota increase requests, because increased quota won't help if the offer type blocks access to the SKU in your target region or zone.
 
@@ -80,7 +80,7 @@ Download and run the multi-threaded quota analyzer:
 
 ```powershell
 # Download the script
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MSBrett/azcapman/main/scripts/quota/Get-AzVMQuotaUsage.ps1" -OutFile "Get-AzVMQuotaUsage.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/microsoft/azcapman/main/scripts/quota/Get-AzVMQuotaUsage.ps1" -OutFile "Get-AzVMQuotaUsage.ps1"
 
 # Analyze specific SKUs and regions
 .\Get-AzVMQuotaUsage.ps1 -SKUs @('Standard_D2s_v5', 'Standard_E2s_v5') -Locations @('eastus', 'westus2') -Threads 4
@@ -101,7 +101,7 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MSBrett/azcapman/main/
 - Required for ensuring true zone alignment across subscriptions
 - Outputs zone peering data for cross-subscription planning
 
-[View complete script documentation →](https://github.com/MSBrett/azcapman/tree/main/scripts/quota)
+[View complete script documentation →](https://github.com/microsoft/azcapman/tree/main/scripts/quota)
 
 ## Audit regional quota and zone access
 

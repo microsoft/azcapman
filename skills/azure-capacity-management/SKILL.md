@@ -9,8 +9,9 @@ description: |
   how to request region access or zonal enablement, how logical and physical availability zones
   map across subscriptions, how to configure quota or budget or anomaly alerts, how AKS node
   pools interact with capacity reservations, how to manage non-compute quotas, how deployment
-  stamps relate to the capacity supply chain, and how to design an estate-level capacity
-  governance program. Also covers quota transfers, overallocation, SKU restrictions, CRG
+  stamps map to FinOps Planning & Estimating, Forecasting, Architecting & Workload Placement,
+  Usage Optimization, and Governance, Policy & Risk, and how Azure capacity controls support
+  estate-level governance. Also covers quota transfers, overallocation, SKU restrictions, CRG
   sharing, billing hierarchy, and subscription vending.
 ---
 
@@ -18,18 +19,21 @@ description: |
 
 Estate-level capacity and quota management for SaaS ISVs operating workloads in subscriptions they own or control under an [Enterprise Agreement (EA)](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/azure-billing-enterprise-agreement) or [Microsoft Customer Agreement (MCA)](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/design-area/azure-billing-microsoft-customer-agreement). This skill aligns with the [ISV landing zone guidance](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/isv-landing-zone) and covers pure SaaS and [stamp-based isolation](https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/approaches/overview#deployment-stamps-pattern) patterns where customers are isolated through dedicated or shared deployment stamps inside the ISV's Azure estate.
 
-Read the full supply chain reference at `references/docs/operations/capacity-and-quotas/README.md`.
+Read the full Azure implementation reference at `references/docs/operations/capacity-and-quotas/README.md`.
 
-## Capacity supply chain
+## FinOps capability mapping
 
-Treat capacity management as a four-step supply chain aligned with [Well-Architected capacity planning](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning), [reliable scaling](https://learn.microsoft.com/en-us/azure/well-architected/reliability/scaling), and [workload supply chain guidance](https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/workload-supply-chain):
+Treat Azure capacity management as implementation detail under the canonical FinOps Framework. Capacity evidence commonly supports Planning & Estimating, Forecasting, Architecting & Workload Placement, Usage Optimization, Rate Optimization, Budgeting, Governance, Policy & Risk, and Automation, Tools & Services. Use [Well-Architected capacity planning](https://learn.microsoft.com/en-us/azure/well-architected/performance-efficiency/capacity-planning), [reliable scaling](https://learn.microsoft.com/en-us/azure/well-architected/reliability/scaling), and [workload supply chain guidance](https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/workload-supply-chain) as Azure implementation guidance, not as a replacement framework. [Source](https://www.finops.org/framework/) [Source](https://www.finops.org/framework/domains/)
 
-| Step | What it does | Azure surfaces |
+| FinOps capability | Capacity question | Azure surfaces |
 |------|-------------|----------------|
-| Forecast | Size scale units from telemetry and business targets | Azure Monitor, capacity planning models, FinOps budgets |
-| Procure | Unblock regions, zones, and SKUs; aggregate quota | Region access requests, zonal enablement, quota groups, per-VM quota increases |
-| Allocate | Lock compute supply for critical SKUs | Capacity reservation groups, CRG sharing, overallocation |
-| Monitor | Track utilization and promote through gates | Quota alerts, budget alerts, anomaly alerts, CI/CD gates |
+| Planning & Estimating | What capacity does the planned workload, scenario, or stamp need? | Workload requirements, scale-unit assumptions, Azure Monitor, estimates, FinOps budgets |
+| Forecasting | When will demand exceed quota, region, SKU, zone, or reserved-capacity headroom? | Historical usage, growth trends, forecast breach dates, capacity planning models |
+| Architecting & Workload Placement | Which regions, zones, SKUs, quota pools, or deployment patterns should change? | SKU availability, region access, quota groups, capacity reservation groups, CRG sharing, overallocation |
+| Usage Optimization | Which allocated capacity, quota, or deployment pattern is underused or inefficient? | Utilization, headroom, rightsizing evidence, unused reserved capacity, demand signals |
+| Rate Optimization | Where should capacity guarantees be coordinated with reservations or savings plans? | Benefit recommendations, commitment utilization, CRG utilization, pricing evidence from FinOps Hub |
+| Governance, Policy & Risk | Which capacity risks need ownership, exception review, or escalation? | Approved regions and SKUs, owner metadata, risk thresholds, exception status |
+| Automation, Tools & Services | Which controls expose capacity risk before deployment or scale events? | Quota alerts, budget alerts, anomaly alerts, CI/CD gates, workflow status |
 
 Read `references/docs/operations/capacity-planning/README.md` for forecasting details and `references/docs/operations/capacity-governance/README.md` for the governance program design.
 
@@ -123,7 +127,6 @@ Three alert types cover the capacity governance space:
 | Deploy-Budget.ps1 | `references/scripts/budgets/` | Deploy individual budgets |
 | Deploy-BulkBudgets.ps1 | `references/scripts/budgets/` | Bulk deploy budgets |
 | Suppress-AdvisorRecommendations.ps1 | `references/scripts/advisor/` | Suppress Advisor recommendations |
-| calculator.py | `references/scripts/calculator/` | Safe math evaluation for cost modeling |
 | Serverless SQL workbook | `references/scripts/serverless-sql-storage/` | Azure Monitor workbook for serverless SQL allocated vs. used storage; identifies databases worth shrinking to reclaim billing waste |
 
 Read the README in each script directory for parameter requirements and prerequisites.
@@ -132,20 +135,20 @@ Read the README in each script directory for parameter requirements and prerequi
 
 These are commonly confused — keep them separated:
 
-- **Capacity reservation vs Azure Reservation vs savings plan:** [Capacity reservations](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-overview) guarantee compute supply. [Azure Reservations](https://learn.microsoft.com/en-us/cloud-computing/finops/framework/optimize/rates#getting-started) and [savings plans](https://learn.microsoft.com/en-us/azure/cost-management-billing/savings-plan/) provide pricing discounts. Capacity guarantees supply; pricing commitments reduce cost.
+- **Capacity reservation vs Azure Reservation vs savings plan:** [Capacity reservations](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-overview) guarantee compute supply. [Azure Reservations](https://www.finops.org/framework/capabilities/rate-optimization/) and [savings plans](https://learn.microsoft.com/en-us/azure/cost-management-billing/savings-plan/) provide pricing discounts. Capacity guarantees supply; pricing commitments reduce cost.
 - **Quota group vs management group:** [Quota groups](https://learn.microsoft.com/en-us/azure/quotas/quota-groups) aggregate compute quota. Management groups organize subscriptions for RBAC and policy. Quota groups are created under management groups but don't inherit their policy or access controls.
 - **Logical vs physical zone:** [Logical zones](https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview#configuring-resources-for-availability-zone-support) are subscription-specific labels. Physical zones are datacenter locations. Zone 1 in subscription A may map to a different physical zone than zone 1 in subscription B.
 - **Region access vs quota increase:** Quota increases raise limits within an already-enabled region. [Region access requests](https://learn.microsoft.com/en-us/troubleshoot/azure/general/region-access-request-process) unblock a restricted region for the subscription.
 
 ## Operational agent
 
-The `azure-capacity-manager` agent is a capacity management specialist. It handles operational tasks like quota analysis and reservation evaluation, but it's also effective for thinking through architecture decisions, sanity-checking assumptions, exploring what-if scenarios, or talking through a customer engagement. It has deep domain expertise in the full capacity supply chain, access to the same references, and can run scripts and `az` commands for live operations. An expert on tap — use it liberally.
+The `azure-capacity-manager` agent is a capacity evidence specialist for FinOps workflows. It handles operational tasks like quota analysis and reservation evaluation, maps Azure capacity evidence back to FinOps capabilities, has access to the same references, and can run scripts and `az` commands for live operations.
 
 ## Documentation map
 
 | Domain | Reference path |
 |--------|---------------|
-| Supply chain hub | `references/docs/operations/capacity-and-quotas/README.md` |
+| Azure capacity reference | `references/docs/operations/capacity-and-quotas/README.md` |
 | Glossary | `references/docs/operations/glossary.md` |
 | Quota operations | `references/docs/operations/quota/README.md` |
 | Quota groups | `references/docs/operations/quota-groups/README.md` |
@@ -164,3 +167,82 @@ The `azure-capacity-manager` agent is a capacity management specialist. It handl
 | Budgets | `references/scripts/budgets/README.md` |
 | Rate optimization | `references/scripts/rate/README.md` |
 | Serverless SQL storage | `references/scripts/serverless-sql-storage/README.md` |
+
+## Notification procedures
+
+<!-- // T-20: RTM FR-10.1, FR-10.2 -->
+The capacity manager can send alerts and reports through [SRE Agent's notification connectors](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications). Use Teams for urgent capacity events and email for periodic reports.
+
+### Teams channel alerts
+
+Use Teams notifications for urgent capacity events that need immediate attention, following the [Azure SRE Agent notification guidance](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications). The SRE Agent sends messages through the Teams connector in HTML format, so keep the payload compact, scannable, and action-oriented, as described in [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
+
+**When to send Teams alerts:**
+- Quota utilization exceeds 80 percent for any VM family in a production region.
+- VM deployment fails with a quota or capacity error.
+- Capacity reservation group utilization drops below 50 percent, which points to wasted spend.
+- Quota group is depleted or nearly depleted.
+- Region access or zonal enablement request is needed.
+
+**Teams alert template:**
+
+Use this HTML template when you compose a Teams message. Include alert severity, the affected resource, current state, the recommended action, and links to the relevant Azure portal blades, following [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
+
+```html
+<h3>⚠️ Quota utilization alert</h3>
+<p><b>Severity:</b> warning<br>
+<b>VM family:</b> Standard_D_v5<br>
+<b>Region:</b> eastus<br>
+<b>Subscription:</b> prod-001<br>
+<b>Usage:</b> 85/100 vCPUs (85%)</p>
+<p><b>Recommended action:</b> Request a quota increase before the next deployment cycle.</p>
+<p>
+  <a href="https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade">Open quota blade</a><br>
+  <a href="https://portal.azure.com/#view/HubsExtension/BrowseResource/resourceType/Microsoft.Compute%2FcapacityReservationGroups">Open capacity reservation groups</a>
+</p>
+```
+
+### Email capacity reports
+
+Use Outlook email for periodic capacity reports and non-urgent recommendations, following the same [Azure SRE Agent notification guidance](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications). The SRE Agent sends email through the Outlook connector in HTML format, so structure the message for scanning first, and detailed follow-up second.
+
+**When to send email reports:**
+- Weekly capacity digest, including quota utilization trends across the estate.
+- Reservation expiring within 30 days, including a renewal recommendation and cost analysis.
+- Monthly savings plan optimization review.
+- Quarterly capacity planning summary.
+- Post-incident capacity analysis.
+
+**Email report template:**
+
+Use this HTML template for email reports. Include the report title, date range, a summary table of key metrics, highlighted findings, recommended actions with priority, and links to Azure portal resources or supporting documentation, as described in [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
+
+```html
+<h2>Weekly capacity digest</h2>
+<p><b>Period:</b> March 3–9, 2026<br>
+<b>Subscriptions analyzed:</b> 47</p>
+<h3>Key findings</h3>
+<table border="1" cellpadding="8">
+<tr><th>Region</th><th>VM family</th><th>Utilization</th><th>Action</th></tr>
+<tr><td>eastus</td><td>Standard_D_v5</td><td>92%</td><td>Request increase</td></tr>
+<tr><td>westus2</td><td>Standard_E_v5</td><td>78%</td><td>Monitor</td></tr>
+</table>
+<h3>Recommendations</h3>
+<ol>
+<li>Request quota increase for Standard_D_v5 in eastus (critical)</li>
+<li>Review CRG utilization in westeurope—45% utilized, consider right-sizing</li>
+<li>Savings plan expires April 15—evaluate renewal versus pay-as-you-go</li>
+</ol>
+<p>
+  <a href="https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade">Open quota blade</a><br>
+  <a href="https://learn.microsoft.com/en-us/azure/quotas/how-to-guide-monitoring-alerting">Review quota monitoring guidance</a>
+</p>
+```
+
+### Scheduled notification patterns
+
+Configure recurring notifications with [Azure SRE Agent scheduled tasks](https://learn.microsoft.com/en-us/azure/sre-agent/scheduled-tasks), and pair the schedule with the connector flow from [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
+
+- Daily: quota utilization check, then send a Teams alert if any family is above 80 percent.
+- Weekly: capacity digest, then send email to stakeholders.
+- Monthly: savings plan and reservation review, then send email with recommendations.
