@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "azcapman",
+  "description": "Azure capacity management plugins for FinOps-aligned capacity planning, quotas, reservations, and governance.",
+  "owner": {
+    "name": "Microsoft"
+  },
+  "plugins": [
+    {
+      "name": "azure-capacity-management",
+      "version": "1.0.0",
+      "source": "./skills",
+      "description": "Azure capacity and quota management for SaaS ISVs operating workloads in ISV-owned Azure.",
+      "category": "finops",
+      "homepage": "https://microsoft.github.io/azcapman/"
+    }
+  ]
+}

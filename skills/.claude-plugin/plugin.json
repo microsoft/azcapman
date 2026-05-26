@@ -1,7 +1,7 @@
 {
   "name": "azure-capacity-management",
   "version": "1.0.0",
-  "description": "Azure capacity and quota management for SaaS ISVs operating workloads in ISV-owned Azure",
+  "description": "Azure capacity and quota management for SaaS ISVs operating workloads in ISV-owned Azure.",
   "author": {
     "name": "Microsoft",
     "url": "https://github.com/microsoft"
@@ -15,5 +15,5 @@
     "quota",
     "finops"
   ],
-  "skills": "../skills/"
+  "skills": "./"
 }
