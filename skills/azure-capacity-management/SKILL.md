@@ -3,16 +3,7 @@ name: azure-capacity-management
 description: |
   This skill should be used when the user asks about Azure capacity management, quota
   operations, or capacity planning for SaaS ISVs running workloads in their own Azure
-  subscriptions under EA or MCA. Relevant queries include: how to increase VM quota across
-  subscriptions, how quota groups work, how to create or share capacity reservation groups,
-  what the difference is between capacity reservations and Azure Reservations or savings plans,
-  how to request region access or zonal enablement, how logical and physical availability zones
-  map across subscriptions, how to configure quota or budget or anomaly alerts, how AKS node
-  pools interact with capacity reservations, how to manage non-compute quotas, how deployment
-  stamps map to FinOps Planning & Estimating, Forecasting, Architecting & Workload Placement,
-  Usage Optimization, and Governance, Policy & Risk, and how Azure capacity controls support
-  estate-level governance. Also covers quota transfers, overallocation, SKU restrictions, CRG
-  sharing, billing hierarchy, and subscription vending.
+  subscriptions under EA or MCA.
 ---
 
 # Azure capacity management
