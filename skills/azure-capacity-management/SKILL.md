@@ -5,8 +5,10 @@ description: |
   operations, or capacity planning for SaaS ISVs running workloads in their own Azure
   subscriptions under EA or MCA. Also covers AI/GPU model quota and capacity (Azure
   OpenAI/Foundry TPM, PTU, cross-region capacity discovery), VM capacity reservations,
-  region/SKU availability lookups, and capacity-forecasting-scoped cost data (cost
-  forecast/query APIs, not general cost optimization).
+  region/SKU availability lookups, capacity-forecasting-scoped cost data (cost
+  forecast/query APIs, not general cost optimization), Azure AI Gateway/APIM
+  rate-limiting and throughput-control policies for AI workloads, and per-service
+  resource/limit/quota reference lookups.
 ---
 
 # Azure capacity management
