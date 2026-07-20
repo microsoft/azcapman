@@ -11,7 +11,6 @@ QuotaQuery*.pbix
 .claude/
 .playwright-mcp/
 CLAUDE.md
-AGENTS.md
 azcapman-docusaurus/
 .github/copilot-*.md
 .github/prompts/*
@@ -32,6 +31,10 @@ _api/
 
 # Ruby/Bundler
 vendor/
+# ...except skills/vendor/, which is intentionally tracked (vendored azure-skills
+# content, see skills/vendor/MANIFEST.md) — not a Ruby vendor/bundle directory.
+!skills/vendor/
+!skills/vendor/**
 .bundle/
 Gemfile.lock
 bin/

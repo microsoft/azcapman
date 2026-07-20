@@ -3,7 +3,12 @@ name: azure-capacity-management
 description: |
   This skill should be used when the user asks about Azure capacity management, quota
   operations, or capacity planning for SaaS ISVs running workloads in their own Azure
-  subscriptions under EA or MCA.
+  subscriptions under EA or MCA. Also covers AI/GPU model quota and capacity (Azure
+  OpenAI/Foundry TPM, PTU, cross-region capacity discovery), VM capacity reservations,
+  region/SKU availability lookups, capacity-forecasting-scoped cost data (cost
+  forecast/query APIs, not general cost optimization), Azure AI Gateway/APIM
+  rate-limiting and throughput-control policies for AI workloads, and per-service
+  resource/limit/quota reference lookups.
 ---
 
 # Azure capacity management
@@ -158,6 +163,48 @@ The `azure-capacity-manager` agent is a capacity evidence specialist for FinOps 
 | Budgets | `references/scripts/budgets/README.md` |
 | Rate optimization | `references/scripts/rate/README.md` |
 | Serverless SQL storage | `references/scripts/serverless-sql-storage/README.md` |
+
+## Vendored upstream skills (microsoft/azure-skills)
+
+Content under `references/vendor/` is unmodified, byte-identical material copied from
+[`microsoft/azure-skills`](https://github.com/microsoft/azure-skills) — it is not
+azcapman-authored, is not edited to fit this skill's voice, and is exempt from AGENTS.md's
+authored-content rules per the exemption clause in AGENTS.md §1. Full source attribution,
+license text, and last-synced commit are in `references/vendor/MANIFEST.md`.
+
+| When to use | Vendored path | Attribution |
+|---|---|---|
+| VM/family core quota checks and increase requests (CLI-driven) | `references/vendor/azure-quotas/SKILL.md` | `references/vendor/MANIFEST.md` |
+| Cost forecast and cost query APIs scoped to capacity forecasting (not general cost optimization) | `references/vendor/azure-cost/SKILL.md` | `references/vendor/MANIFEST.md` |
+| Azure AI Gateway / APIM policies for AI workload throughput and rate-limit patterns | `references/vendor/azure-aigateway/SKILL.md` | `references/vendor/MANIFEST.md` |
+| VM/compute capacity reservations (creation, association/disassociation) | `references/vendor/azure-compute/workflows/capacity-reservation/capacity-reservation.md` | `references/vendor/MANIFEST.md` |
+| Azure OpenAI/Foundry model quota (TPM, PTU, cross-region capacity discovery) | `references/vendor/microsoft-foundry/quota/quota.md` | `references/vendor/MANIFEST.md` |
+| Foundry model deployment capacity checks during model deploy | `references/vendor/microsoft-foundry/models/deploy-model/capacity/SKILL.md` | `references/vendor/MANIFEST.md` |
+| General per-service resource/limit/quota reference table | `references/vendor/azure-prepare/references/resources-limits-quotas.md` | `references/vendor/MANIFEST.md` |
+| Region and SKU availability lookups | `references/vendor/azure-validate/references/region-availability.md` | `references/vendor/MANIFEST.md` |
+
+The three whole-skill copies (`azure-quotas`, `azure-cost`, `azure-aigateway`) keep their
+own internal `SKILL.md` structure for their own references and scripts — they are not
+separately registered as standalone skills in this repo; this skill is the only
+discovery path into them.
+
+## Updating vendored content
+
+`references/vendor/` is refreshed manually, not by a script or scheduled job. To update
+it:
+
+1. For each of the 8 paths listed in `references/vendor/MANIFEST.md`, re-fetch the file
+   from `microsoft/azure-skills`'s `main` branch (e.g. via `gh api` or `curl` against
+   `raw.githubusercontent.com/microsoft/azure-skills/main/<path>`) and overwrite the
+   vendored copy byte-for-byte.
+2. Verify each file with `git hash-object <file>` against the new upstream blob SHA
+   (from the GitHub API for that path) to confirm an exact copy — no manual retyping or
+   edits.
+3. Update `MANIFEST.md`'s "last synced" commit SHA and date to the new commit.
+4. Note any files added or removed upstream within those same 8 paths in
+   `MANIFEST.md`. This is a refresh of existing content, not a re-scoping exercise — the
+   8-target list itself only changes via a deliberate, separate decision, not as a side
+   effect of a routine sync.
 
 ## Notification procedures
 
