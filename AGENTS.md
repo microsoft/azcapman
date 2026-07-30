@@ -71,7 +71,12 @@ governed by this document.
 
 This repository's CI, scripts, and packaging execute third-party code. Every such
 dependency is a supply chain entry point into anyone who clones or installs this
-repository.
+repository. GitHub's
+[secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+is the canonical source for the mechanics below: "a compromise of a single action
+within a workflow can be very significant, as that compromised action would have
+access to all secrets configured on your repository, and may be able to use the
+`GITHUB_TOKEN` to write to the repository."
 
 - **No ad hoc package runners or piped installers in CI.** A workflow step must
   not fetch code and execute it in the same breath. `npx`, `bunx`, `uvx`,
@@ -84,11 +89,25 @@ repository.
   `dotnet tool install --version` is in `docfx-gh-pages.yml`. Pinning doesn't make
   the fetch disappear; it makes the fetched artifact the same one that was
   reviewed. `@latest` and floating ranges let CI auto-execute releases nobody read.
-- **Pin actions to immutable commit SHAs, never tags, and keep the set small.**
-  `@v4` is a moving pointer that anyone with push access to that repository can
-  repoint at new code. Write `uses: owner/action@<40-char-sha> # v4`. Actions are
-  allowed by publisher, not just by pin — adding a new one means adding it to the
-  list in `.github/scripts/check-supply-chain.py`, which is a review decision.
+- **Pin actions to a full-length commit SHA, never a tag, and keep the set small.**
+  Per [Learn more](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions),
+  pinning to a full-length commit SHA "is currently the only way to use an action as
+  an immutable release," while "a tag can be moved or deleted if a bad actor gains
+  access to the repository storing the action." The same page requires verifying the
+  SHA "is from the action's repository and not a repository fork." Write
+  `uses: owner/action@<40-char-sha> # v4`. Actions are allowed by publisher as well as
+  by pin — adding one means adding it to the list in
+  `.github/scripts/check-supply-chain.py`, which is a review decision. The same risks
+  apply to reusable workflows sourced from other repositories.
+- **Give every job an explicit `permissions:` block.** GitHub states it's "good
+  security practice to set the default permission for the `GITHUB_TOKEN` to read
+  access only for repository contents," raised per job only as required.
+- **Set `persist-credentials: false` on checkout** unless a later step needs to run
+  authenticated git commands. [`actions/checkout`](https://github.com/actions/checkout/tree/11d5960a326750d5838078e36cf38b85af677262#usage)
+  persists the auth token in the local git config by default.
+- **Don't check out untrusted code in a privileged context.** GitHub identifies
+  `pull_request_target` and `workflow_run` combined with an untrusted checkout as
+  triggers that "expose the repository to security compromises."
 - Verify publisher identity **before** adding any package to CI, a script, or the
   docs — author, source repository, and publish history. A `0.x` release published
   under a personal email address is not first-party, however official its name and
@@ -102,8 +121,13 @@ repository.
 `.github/scripts/check-supply-chain.py` checks these mechanically, and
 `.github/scripts/test-supply-chain.py` covers each rule with a case that must fail.
 Both are tripwires that catch mistakes in review, not a root of trust — a pull
-request can edit them. The controls that bind are branch protection, CODEOWNERS on
-`.github/**`, and repository or organization action policy.
+request can edit them. The controls that bind sit outside the pull request:
+[branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches),
+[CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
+on `.github/**` — which GitHub recommends specifically so "any proposed changes to
+these files will first require approval from a designated reviewer" — and the
+repository or organization
+[policy that requires actions to be pinned to a full-length commit SHA](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository).
 
 This rule governs this repository's own automation.
 [1.2](#12-no-operations-no-best-practices-no-opinions) constrains the subject-matter
