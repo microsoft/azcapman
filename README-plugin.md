@@ -1,74 +1,112 @@
 # Azure capacity management plugin
 
-Plugin for Azure capacity and quota management, built for the azcapman repository. It packages for Claude Code, GitHub Copilot, and [Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/overview).
+This repository packages its Azure capacity and quota content as an installable plugin
+for five agentic harnesses. The skill content is authored once, in
+`skills/azure-capacity-management/`, and every harness reads that same file.
 
-## Distribution targets
+## How one skill serves every target
+
+`SKILL.md` follows [Agent Skills](https://agentskills.io/specification), an open
+specification supported across multiple agents. `gh skill install --agent` accepts 47
+agent targets, so the same skill directory is portable well beyond the five listed here.
+
+The skill's `references/` directory uses symlinks to `docs/`, `scripts/`, and
+`skills/vendor/`. Because those targets live in this same repository, they resolve
+after a clone, and every install path below clones or fetches the repository.
+
+## Install
 
 ### Claude Code
 
-Packages a Claude Code plugin with the `azure-capacity-manager` agent and the `azure-capacity-management` skill for operational analysis, planning, and engagement preparation.
+Add this repository as a marketplace, then install the plugin:
 
-**What's included:**
-- Agent (`agents/azure-capacity-manager.md`) for quota, capacity reservation, and quota group tasks
-- Skill (`skills/azure-capacity-management/SKILL.md`) for Azure capacity evidence mapped to FinOps Framework capabilities
-- Plugin manifest (`.claude-plugin/plugin.json`) for the Claude Code distribution package
+```
+/plugin marketplace add microsoft/azcapman
+/plugin install azure-capacity-management@azcapman
+```
+
+Manifests: `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`, per the
+[Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference).
 
 ### GitHub Copilot
 
-Packages the same `azure-capacity-management` skill as a standalone GitHub Copilot distribution target, so you can reuse the repository references without the Claude Code agent wrapper.
+Install the skill with the [GitHub CLI](https://cli.github.com/manual/gh_skill_install)
+(v2.90.0 or later):
 
-**What's included:**
-- Skill (`skills/azure-capacity-management/`) with `SKILL.md` and `references/`
-- Reference symlinks (`skills/azure-capacity-management/references/`) to `docs/` and `scripts/`
+```
+gh skill install microsoft/azcapman azure-capacity-management
+```
 
-<!-- T-23: RTM NFR-8.1 -->
+Preview it first without installing:
+
+```
+gh skill preview microsoft/azcapman azure-capacity-management
+```
+
+The custom agent at `.github/agents/azure-capacity-manager.agent.md` follows the
+[custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+Its `target` property is unset, so it applies to both GitHub Copilot and VS Code.
+
+### VS Code
+
+VS Code reads [Agent Skills](https://code.visualstudio.com/docs/agent-customization/agent-skills)
+and the same `.github/agents/` custom agent as GitHub Copilot. Clone the repository, or
+install the skill with `gh skill install` as shown above. No extension is required.
+
 ### Azure SRE Agent
 
-The plugin also packages as an [Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/overview) skill and subagent for operational capacity management in production Azure environments.
+In an existing agent, go to **Builder** > **Plugins** > **Install from URL** and enter
+`microsoft/azcapman`, or add the repository as a marketplace. Azure SRE Agent accepts
+`.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` as manifest locations,
+per the [plugin marketplace documentation](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
+and [install from a URL](https://learn.microsoft.com/en-us/azure/sre-agent/install-plugin-from-url).
 
-**What's included:**
-- Skill (`sre-agent/skill/`) that auto-activates during capacity-related incidents and attaches Azure CLI tools through [skills in Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
-- Subagent (`sre-agent/subagent/`) that you can invoke through `/agent capacity-manager`, and that runs in [Review mode](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
-- Knowledge files (`sre-agent/knowledge/`) with reference docs for quota operations, capacity reservations, and quota groups, aligned with [knowledge uploads](https://learn.microsoft.com/en-us/azure/sre-agent/upload-knowledge-document)
-- Deployment guide (`sre-agent/README.md`) with setup instructions for the Builder UI flow described in [skills in Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
+Installation pins to the git commit at install time, so later changes to this repository
+don't alter an installed agent until you update it.
 
-**Notifications:** Supports Teams and Outlook email notifications for capacity alerts and reports through [SRE Agent connectors](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
+### OpenAI Codex
 
-## How references work
-
-The skill uses symlinks to reference the full repository documentation without duplication:
+Add the repository as a plugin marketplace, per the
+[Codex plugin documentation](https://developers.openai.com/plugins/build/plugins):
 
 ```
-skills/azure-capacity-management/references/
-  docs -> ../../../docs           # All operational docs, billing, deployment patterns
-  scripts -> ../../../scripts     # PowerShell and Python tools with READMEs
+codex plugin marketplace add microsoft/azcapman
 ```
 
-This keeps the skill in sync with the source documentation, and avoids duplicate copies to maintain.
+Manifest: `.codex-plugin/plugin.json`. Codex also reads `AGENTS.md` from the repository
+root, per [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
+
+## Layout
+
+```
+.claude-plugin/plugin.json                     # Claude Code, Azure SRE Agent, VS Code
+.claude-plugin/marketplace.json                # Marketplace manifest for the same three
+.codex-plugin/plugin.json                      # OpenAI Codex
+.github/agents/azure-capacity-manager.agent.md # GitHub Copilot and VS Code
+agents/azure-capacity-manager.md               # Claude Code agent
+skills/azure-capacity-management/SKILL.md      # Shared skill, Agent Skills specification
+skills/azure-capacity-management/references/   # Symlinks to docs, scripts, and vendor
+sre-agent/                                     # ExtendedAgent subagent YAML, a separate
+                                               # in-portal mechanism, not plugin install
+```
+
+## Validation
+
+Three first-party validators cover this packaging, and
+`.github/workflows/validate-plugins.yml` runs all of them on every change:
+
+| Command | Covers |
+| --- | --- |
+| `npx skills-ref validate skills/azure-capacity-management` | Agent Skills specification compliance |
+| `gh skill publish --dry-run` | GitHub's skill naming, frontmatter, and metadata checks |
+| `npx @anthropic-ai/claude-code plugin validate . --strict` | Claude Code plugin and marketplace manifests |
+
+`gh skill publish --dry-run` validates without publishing and needs no write access, so
+it runs as a plain lint step.
 
 ## Integration
 
-### Azure CLI
-
-The agent uses `az` commands for live Azure operations including quota queries, CRG management, AKS operations, billing, and estate enumeration. No additional tooling is required beyond an authenticated Azure CLI session, as described in [Azure CLI quota commands](https://learn.microsoft.com/en-us/cli/azure/quota?view=azure-cli-latest).
-
-### maenifold
-
-When available, the agent uses maenifold skills for knowledge graph operations and context engineering across conversations.
-
-### Microsoft Docs MCP
-
-The agent can pull the latest Microsoft Learn content through `microsoft_docs_search` and `microsoft_docs_fetch` when repository documentation doesn't cover a specific scenario.
-
-## Repository structure
-
-```
-.claude-plugin/plugin.json                                # Claude Code plugin manifest
-agents/azure-capacity-manager.md                          # Claude Code agent definition
-skills/azure-capacity-management/SKILL.md                 # Shared skill definition
-skills/azure-capacity-management/references/              # Symlinks to docs and scripts
-sre-agent/README.md                                       # Azure SRE Agent deployment guide
-sre-agent/skill/                                          # Azure SRE Agent skill package
-sre-agent/subagent/                                       # Azure SRE Agent subagent package
-sre-agent/knowledge/                                      # Azure SRE Agent knowledge files
-```
+The skill uses `az` CLI commands for live Azure operations, including quota queries,
+capacity reservation group management, and estate enumeration. An authenticated Azure CLI
+session is the only requirement, per the
+[Azure CLI quota reference](https://learn.microsoft.com/en-us/cli/azure/quota).

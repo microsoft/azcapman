@@ -1,0 +1,78 @@
+name: Validate plugin packaging
+
+on:
+  push:
+    paths:
+      - 'skills/**'
+      - '.claude-plugin/**'
+      - '.codex-plugin/**'
+      - '.github/agents/**'
+      - '.github/workflows/validate-plugins.yml'
+  pull_request:
+    paths:
+      - 'skills/**'
+      - '.claude-plugin/**'
+      - '.codex-plugin/**'
+      - '.github/agents/**'
+      - '.github/workflows/validate-plugins.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Manifest JSON must parse before any tool reads it.
+      - name: Check manifest JSON syntax
+        run: |
+          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json .codex-plugin/plugin.json; do
+            echo "Checking $f"
+            python3 -c "import json,sys; json.load(open('$f'))"
+          done
+
+      # Agent Skills open standard (agentskills.io) - validates the shared SKILL.md
+      # that serves Claude Code, Codex, GitHub Copilot, VS Code, and Azure SRE Agent.
+      - name: Validate skills against the Agent Skills specification
+        run: |
+          fail=0
+          for skill in skills/*/; do
+            [ -f "${skill}SKILL.md" ] || continue
+            echo "== ${skill}"
+            npx --yes skills-ref validate "${skill%/}" || fail=1
+          done
+          exit $fail
+
+      # GitHub's own validator: strict agentskills.io naming, name/directory match,
+      # required frontmatter, allowed-tools type, and install-metadata stripping.
+      - name: Validate skills with gh skill
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh skill publish --dry-run
+
+      # Claude Code manifest validator. --strict fails on unrecognized fields and
+      # missing metadata that the runtime would otherwise tolerate.
+      - name: Validate Claude Code plugin and marketplace manifests
+        run: npx --yes @anthropic-ai/claude-code@latest plugin validate . --strict
+
+      # Custom agent files are capped at 30,000 characters for GitHub Copilot.
+      - name: Check custom agent prompt size
+        run: |
+          fail=0
+          for f in .github/agents/*.agent.md; do
+            [ -f "$f" ] || continue
+            size=$(wc -c < "$f")
+            echo "$f: $size bytes"
+            if [ "$size" -gt 30000 ]; then
+              echo "::error file=$f::exceeds the 30000 character limit for custom agents"
+              fail=1
+            fi
+          done
+          exit $fail
