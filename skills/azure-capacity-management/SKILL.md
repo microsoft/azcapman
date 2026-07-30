@@ -9,6 +9,7 @@ description: |
   forecast/query APIs, not general cost optimization), Azure AI Gateway/APIM
   rate-limiting and throughput-control policies for AI workloads, and per-service
   resource/limit/quota reference lookups.
+license: MIT
 ---
 
 # Azure capacity management
