@@ -2,7 +2,7 @@
 
 This file governs every contribution to this repository, human or AI. It is the
 canonical source for scope, voice, and style referenced elsewhere in this repository
-(`PRD.md`, `RTM.md`, `agents/azure-capacity-manager.md`,
+(`PRD.md`, `RTM.md`, `agents/azure-capacity-manager.agent.md`,
 `skills/azure-capacity-management/SKILL.md`, `sre-agent/`). If any other file's
 guidance conflicts with this one, this file wins.
 

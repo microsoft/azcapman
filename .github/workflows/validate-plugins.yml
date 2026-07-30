@@ -3,17 +3,19 @@ name: Validate plugin packaging
 on:
   push:
     paths:
+      - 'agents/**'
       - 'skills/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
-      - '.github/agents/**'
+      - '.github/plugin/**'
       - '.github/workflows/validate-plugins.yml'
   pull_request:
     paths:
+      - 'agents/**'
       - 'skills/**'
       - '.claude-plugin/**'
       - '.codex-plugin/**'
-      - '.github/agents/**'
+      - '.github/plugin/**'
       - '.github/workflows/validate-plugins.yml'
   workflow_dispatch:
 
@@ -30,25 +32,11 @@ jobs:
         with:
           node-version: '22'
 
-      # Manifest JSON must parse before any tool reads it.
-      - name: Check manifest JSON syntax
-        run: |
-          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json .codex-plugin/plugin.json; do
-            echo "Checking $f"
-            python3 -c "import json,sys; json.load(open('$f'))"
-          done
-
-      # Agent Skills open standard (agentskills.io) - validates the shared SKILL.md
-      # that serves Claude Code, Codex, GitHub Copilot, VS Code, and Azure SRE Agent.
-      - name: Validate skills against the Agent Skills specification
-        run: |
-          fail=0
-          for skill in skills/*/; do
-            [ -f "${skill}SKILL.md" ] || continue
-            echo "== ${skill}"
-            npx --yes skills-ref validate "${skill%/}" || fail=1
-          done
-          exit $fail
+      # Parses all five manifests, checks that the fields they share agree, confirms
+      # every declared path exists, and validates agents/*.agent.md against the
+      # GitHub Copilot custom agent schema.
+      - name: Validate manifests and custom agents
+        run: python3 .github/plugin/validate-manifests.py
 
       # GitHub's own validator: strict agentskills.io naming, name/directory match,
       # required frontmatter, allowed-tools type, and install-metadata stripping.
@@ -58,21 +46,7 @@ jobs:
         run: gh skill publish --dry-run
 
       # Claude Code manifest validator. --strict fails on unrecognized fields and
-      # missing metadata that the runtime would otherwise tolerate.
+      # missing metadata that the runtime would otherwise tolerate. Pinned rather
+      # than @latest so CI never auto-executes an unreviewed new release.
       - name: Validate Claude Code plugin and marketplace manifests
-        run: npx --yes @anthropic-ai/claude-code@latest plugin validate . --strict
-
-      # Custom agent files are capped at 30,000 characters for GitHub Copilot.
-      - name: Check custom agent prompt size
-        run: |
-          fail=0
-          for f in .github/agents/*.agent.md; do
-            [ -f "$f" ] || continue
-            size=$(wc -c < "$f")
-            echo "$f: $size bytes"
-            if [ "$size" -gt 30000 ]; then
-              echo "::error file=$f::exceeds the 30000 character limit for custom agents"
-              fail=1
-            fi
-          done
-          exit $fail
+        run: npx --yes @anthropic-ai/claude-code@2.1.218 plugin validate . --strict

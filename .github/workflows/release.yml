@@ -17,12 +17,16 @@ jobs:
       - name: Stage plugin zip
         run: |
           mkdir -p staging/plugin/azure-capacity-management/.claude-plugin
+          mkdir -p staging/plugin/azure-capacity-management/.github/plugin
+          mkdir -p staging/plugin/azure-capacity-management/.codex-plugin
           mkdir -p staging/plugin/azure-capacity-management/agents
           mkdir -p staging/plugin/azure-capacity-management/skills/azure-capacity-management/references
 
-          # Manifest and agent
+          # Manifests and agent
           cp .claude-plugin/plugin.json staging/plugin/azure-capacity-management/.claude-plugin/
-          cp agents/azure-capacity-manager.md staging/plugin/azure-capacity-management/agents/
+          cp .github/plugin/plugin.json staging/plugin/azure-capacity-management/.github/plugin/
+          cp .codex-plugin/plugin.json staging/plugin/azure-capacity-management/.codex-plugin/
+          cp agents/azure-capacity-manager.agent.md staging/plugin/azure-capacity-management/agents/
 
           # Skill (resolve symlinks, exclude build artifacts)
           cp skills/azure-capacity-management/SKILL.md staging/plugin/azure-capacity-management/skills/azure-capacity-management/

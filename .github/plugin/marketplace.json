@@ -1,9 +1,12 @@
 {
   "name": "azcapman",
-  "description": "Azure capacity and quota management for SaaS ISVs operating workloads in ISV-owned subscriptions under EA or MCA.",
   "owner": {
     "name": "Microsoft",
     "url": "https://github.com/microsoft/azcapman"
+  },
+  "metadata": {
+    "description": "Azure capacity and quota management for SaaS ISVs operating workloads in ISV-owned subscriptions under EA or MCA.",
+    "version": "1.0.0"
   },
   "plugins": [
     {
@@ -14,6 +17,9 @@
       "license": "MIT",
       "homepage": "https://github.com/microsoft/azcapman",
       "repository": "https://github.com/microsoft/azcapman",
+      "agents": [
+        "./agents/azure-capacity-manager.agent.md"
+      ],
       "skills": [
         "./skills/azure-capacity-management"
       ],

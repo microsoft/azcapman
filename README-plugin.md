@@ -1,7 +1,8 @@
 # Azure capacity management plugin
 
 This repository packages its Azure capacity and quota content as an installable plugin
-for five agentic harnesses. The skill content is authored once, in
+for Claude Code, OpenAI Codex, GitHub Copilot CLI, the GitHub Copilot cloud agent,
+VS Code, and Azure SRE Agent. The skill content is authored once, in
 `skills/azure-capacity-management/`, and every harness reads that same file.
 
 ## How one skill serves every target
@@ -28,30 +29,65 @@ Add this repository as a marketplace, then install the plugin:
 Manifests: `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`, per the
 [Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference).
 
-### GitHub Copilot
+### GitHub Copilot CLI
 
-Install the skill with the [GitHub CLI](https://cli.github.com/manual/gh_skill_install)
-(v2.90.0 or later):
+Add this repository as a plugin marketplace, then install the plugin:
+
+```
+copilot plugin marketplace add microsoft/azcapman
+copilot plugin install azure-capacity-management@azcapman
+```
+
+Manifests: `.github/plugin/marketplace.json` and `.github/plugin/plugin.json`, per the
+[CLI plugin reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference)
+and [Creating a plugin marketplace](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-marketplace).
+
+The plugin installs one skill and one custom agent. The agent is namespaced by plugin,
+so address it as `azure-capacity-management:azure-capacity-manager`:
+
+```
+copilot --agent azure-capacity-management:azure-capacity-manager
+```
+
+Copilot CLI also accepts `copilot plugin install microsoft/azcapman` to install straight
+from the repository, but the CLI reports that direct repository, URL, and local-path
+installs are deprecated in favour of `plugin@marketplace`. Use the marketplace commands
+above.
+
+To install only the skill, without the plugin or its agent, use the
+[GitHub CLI](https://cli.github.com/manual/gh_skill_install) (v2.90.0 or later):
 
 ```
 gh skill install microsoft/azcapman azure-capacity-management
 ```
 
-Preview it first without installing:
+### GitHub Copilot cloud agent
 
-```
-gh skill preview microsoft/azcapman azure-capacity-management
-```
+The cloud agent installs plugins declaratively. Add the marketplace and the plugin to
+`.github/copilot/settings.json` in the repository the agent works in, per
+[About GitHub Copilot plugins](https://docs.github.com/en/copilot/concepts/agents/about-plugins):
 
-The custom agent at `.github/agents/azure-capacity-manager.agent.md` follows the
-[custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
-Its `target` property is unset, so it applies to both GitHub Copilot and VS Code.
+```json
+{
+  "extraKnownMarketplaces": {
+    "azcapman": {
+      "source": {
+        "source": "github",
+        "repo": "microsoft/azcapman"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "azure-capacity-management@azcapman": true
+  }
+}
+```
 
 ### VS Code
 
 VS Code reads [Agent Skills](https://code.visualstudio.com/docs/agent-customization/agent-skills)
-and the same `.github/agents/` custom agent as GitHub Copilot. Clone the repository, or
-install the skill with `gh skill install` as shown above. No extension is required.
+and auto-detects `.claude-plugin/plugin.json`. Clone the repository, or install the skill
+with `gh skill install` as shown above. No extension is required.
 
 ### Azure SRE Agent
 
@@ -79,30 +115,42 @@ root, per [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configurati
 ## Layout
 
 ```
+.github/plugin/plugin.json                     # GitHub Copilot CLI and cloud agent
+.github/plugin/marketplace.json                # Marketplace manifest for the same
 .claude-plugin/plugin.json                     # Claude Code, Azure SRE Agent, VS Code
 .claude-plugin/marketplace.json                # Marketplace manifest for the same three
-.codex-plugin/plugin.json                      # OpenAI Codex
-.github/agents/azure-capacity-manager.agent.md # GitHub Copilot and VS Code
-agents/azure-capacity-manager.md               # Claude Code agent
+.codex-plugin/plugin.json                      # OpenAI Codex, skills only
+agents/azure-capacity-manager.agent.md         # Custom agent, shipped by the plugin
 skills/azure-capacity-management/SKILL.md      # Shared skill, Agent Skills specification
 skills/azure-capacity-management/references/   # Symlinks to docs, scripts, and vendor
 sre-agent/                                     # ExtendedAgent subagent YAML, a separate
                                                # in-portal mechanism, not plugin install
 ```
 
+Every manifest points at the same `agents/` directory and the same single skill
+directory. Scoping `skills` to `./skills/azure-capacity-management` keeps the vendored
+upstream skills under `skills/vendor/` out of the published set; they stay reachable only
+through this skill's `references/vendor/` path, as `SKILL.md` describes.
+
 ## Validation
 
-Three first-party validators cover this packaging, and
-`.github/workflows/validate-plugins.yml` runs all of them on every change:
+Two first-party validators and a set of structural checks cover this packaging, and
+`.github/workflows/validate-plugins.yml` runs both of them on every change:
 
 | Command | Covers |
 | --- | --- |
-| `npx skills-ref validate skills/azure-capacity-management` | Agent Skills specification compliance |
 | `gh skill publish --dry-run` | GitHub's skill naming, frontmatter, and metadata checks |
 | `npx @anthropic-ai/claude-code plugin validate . --strict` | Claude Code plugin and marketplace manifests |
 
 `gh skill publish --dry-run` validates without publishing and needs no write access, so
 it runs as a plain lint step.
+
+The workflow also parses all five manifests, checks that the fields they share agree,
+confirms every path a manifest points at exists, and validates each `agents/*.agent.md`
+file against the
+[custom agent schema](https://docs.github.com/en/copilot/reference/custom-agents-configuration):
+`name` and `description` present, no keys from other harnesses' formats, and a prompt
+body under the 30,000-character limit.
 
 ## Integration
 

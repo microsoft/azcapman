@@ -1,11 +1,6 @@
 ---
 name: azure-capacity-manager
-description: |
-  Use this agent for Azure capacity, quota, and reservation management tasks for SaaS ISVs.
-  Trigger when the user needs operational analysis, planning, or engagement preparation
-  related to Azure estate-level controls.
-skills:
-  - azure-capacity-management
+description: Azure capacity, quota, and reservation management for SaaS ISVs operating workloads in ISV-owned subscriptions under EA or MCA. Use for quota operations, capacity reservation groups, quota groups, region and zonal access, and capacity-scoped billing analysis.
 ---
 
 # Azure capacity manager
