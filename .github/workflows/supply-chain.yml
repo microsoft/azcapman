@@ -6,6 +6,7 @@ on:
   # No paths filter. This runs as a required status check on main, and a required
   # check that never reports leaves a pull request stuck on "Expected" forever.
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
