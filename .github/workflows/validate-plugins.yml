@@ -2,21 +2,10 @@ name: Validate plugin packaging
 
 on:
   push:
-    paths:
-      - 'agents/**'
-      - 'skills/**'
-      - '.claude-plugin/**'
-      - '.codex-plugin/**'
-      - '.github/plugin/**'
-      - '.github/workflows/validate-plugins.yml'
+    branches: [main]
+  # No paths filter. These run as required status checks on main, and a required
+  # check that never reports leaves a pull request stuck on "Expected" forever.
   pull_request:
-    paths:
-      - 'agents/**'
-      - 'skills/**'
-      - '.claude-plugin/**'
-      - '.codex-plugin/**'
-      - '.github/plugin/**'
-      - '.github/workflows/validate-plugins.yml'
   workflow_dispatch:
 
 permissions:
