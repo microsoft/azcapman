@@ -1,0 +1,35 @@
+name: Supply chain
+
+on:
+  push:
+    branches: [main]
+  # No paths filter. This runs as a required status check on main, and a required
+  # check that never reports leaves a pull request stuck on "Expected" forever.
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions are pinned to immutable commit SHAs, not tags. A tag like @v4 can be
+      # repointed at any commit by anyone who can push to that repo.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      # Enforces AGENTS.md rule 1.4 on this repo's own CI: every action approved and
+      # pinned to a commit SHA, no fetch-and-execute (npx, curl|sh, and friends), no
+      # unpinned installs, explicit token scopes. Parses the YAML and walks
+      # jobs -> steps, so a folded block scalar can't hide a pipe across a line break.
+      # Stdlib plus PyYAML, so this check downloads nothing itself.
+      - name: Check CI supply chain
+        run: python3 .github/scripts/check-supply-chain.py
+
+      # Proves the checker still rejects each class of bypass it claims to cover.
+      - name: Test the supply chain checker
+        run: python3 .github/scripts/test-supply-chain.py

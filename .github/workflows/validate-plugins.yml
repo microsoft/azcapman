@@ -2,21 +2,11 @@ name: Validate plugin packaging
 
 on:
   push:
-    paths:
-      - 'agents/**'
-      - 'skills/**'
-      - '.claude-plugin/**'
-      - '.codex-plugin/**'
-      - '.github/plugin/**'
-      - '.github/workflows/validate-plugins.yml'
+    branches: [main]
+  # No paths filter. These run as required status checks on main, and a required
+  # check that never reports leaves a pull request stuck on "Expected" forever.
   pull_request:
-    paths:
-      - 'agents/**'
-      - 'skills/**'
-      - '.claude-plugin/**'
-      - '.codex-plugin/**'
-      - '.github/plugin/**'
-      - '.github/workflows/validate-plugins.yml'
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -26,27 +16,24 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      # Actions are pinned to immutable commit SHAs, not tags. A tag like @v4 can be
+      # repointed at any commit by anyone who can push to that repo.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          node-version: '22'
+          persist-credentials: false
 
       # Parses all five manifests, checks that the fields they share agree, confirms
       # every declared path exists, and validates agents/*.agent.md against the
-      # GitHub Copilot custom agent schema.
+      # GitHub Copilot custom agent schema. Runs from this repo with the stdlib only,
+      # so it downloads nothing.
       - name: Validate manifests and custom agents
         run: python3 .github/plugin/validate-manifests.py
 
       # GitHub's own validator: strict agentskills.io naming, name/directory match,
       # required frontmatter, allowed-tools type, and install-metadata stripping.
+      # `gh skill` is built into the gh CLI preinstalled on the runner - nothing is
+      # fetched to run this.
       - name: Validate skills with gh skill
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh skill publish --dry-run
-
-      # Claude Code manifest validator. --strict fails on unrecognized fields and
-      # missing metadata that the runtime would otherwise tolerate. Pinned rather
-      # than @latest so CI never auto-executes an unreviewed new release.
-      - name: Validate Claude Code plugin and marketplace manifests
-        run: npx --yes @anthropic-ai/claude-code@2.1.218 plugin validate . --strict
