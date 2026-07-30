@@ -73,17 +73,44 @@ This repository's CI, scripts, and packaging execute third-party code. Every suc
 dependency is a supply chain entry point into anyone who clones or installs this
 repository.
 
+- **No ad hoc package runners or piped installers in CI.** A workflow step must
+  not fetch code and execute it in the same breath. `npx`, `bunx`, `uvx`,
+  `pipx run`, `go run <url>`, `curl … | sh`, and `iwr … | iex` are all banned in
+  `.github/**`. Use a checked-in script, a tool preinstalled on the runner, or an
+  approved action instead. If a validator is only available through a package
+  runner, reproduce the rules it enforces in a checked-in script and cover each
+  with a test.
+- **A runtime install is allowed only when it's version-pinned**, as
+  `dotnet tool install --version` is in `docfx-gh-pages.yml`. Pinning doesn't make
+  the fetch disappear; it makes the fetched artifact the same one that was
+  reviewed. `@latest` and floating ranges let CI auto-execute releases nobody read.
+- **Pin actions to immutable commit SHAs, never tags, and keep the set small.**
+  `@v4` is a moving pointer that anyone with push access to that repository can
+  repoint at new code. Write `uses: owner/action@<40-char-sha> # v4`. Actions are
+  allowed by publisher, not just by pin — adding a new one means adding it to the
+  list in `.github/scripts/check-supply-chain.py`, which is a review decision.
 - Verify publisher identity **before** adding any package to CI, a script, or the
   docs — author, source repository, and publish history. A `0.x` release published
   under a personal email address is not first-party, however official its name and
   keywords look.
-- Pin exact versions. `@latest`, floating tags, and unpinned action refs let CI
-  auto-execute releases that nobody reviewed.
 - Never describe a dependency as "first-party," "official," or "Microsoft" without a
   link that proves it. That's a factual claim, so [1.1](#11-no-fabrication--everything-links-to-a-canonical-source)
   applies to it in full.
 - Do not inherit trust from an entry that's already here. A dependency present in the
   repository has not necessarily been vetted.
+
+`.github/scripts/check-supply-chain.py` checks these mechanically, and
+`.github/scripts/test-supply-chain.py` covers each rule with a case that must fail.
+Both are tripwires that catch mistakes in review, not a root of trust — a pull
+request can edit them. The controls that bind are branch protection, CODEOWNERS on
+`.github/**`, and repository or organization action policy.
+
+This rule governs this repository's own automation.
+[1.2](#12-no-operations-no-best-practices-no-opinions) constrains the subject-matter
+content this repository publishes about Azure; it doesn't stop this document from
+setting rules for contributions to this repository. The rule also doesn't reach
+documentation that tells a reader how to install Microsoft's own tooling on their own
+machine — for example, `Install-Module -Name Az` in a script's prerequisites.
 
 ## 2. Mission
 
@@ -201,5 +228,7 @@ Before considering any documentation change complete, confirm:
 - [ ] Terminology matches `docs/operations/glossary.md`; new terms added there first
 - [ ] New pages added to the relevant `toc.yml`
 - [ ] Citation matrix regenerated if citations changed
-- [ ] Any new third-party dependency has a verified publisher and a pinned version
-      ([1.4](#14-verified-pinned-dependencies))
+- [ ] Any new third-party dependency has a verified publisher and a pinned version,
+      no workflow step fetches and executes code, and every action is pinned to a
+      commit SHA ([1.4](#14-verified-pinned-dependencies)) — run
+      `python3 .github/scripts/check-supply-chain.py`

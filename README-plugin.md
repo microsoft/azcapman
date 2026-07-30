@@ -134,18 +134,45 @@ through this skill's `references/vendor/` path, as `SKILL.md` describes.
 
 ## Validation
 
-Two first-party validators and a set of structural checks cover this packaging, and
-`.github/workflows/validate-plugins.yml` runs both of them on every change:
+`.github/workflows/validate-plugins.yml` runs two checks on every change, and **neither
+one downloads anything**:
 
 | Command | Covers |
 | --- | --- |
+| `python3 .github/plugin/validate-manifests.py` | Cross-manifest agreement, path existence, component shape, agent frontmatter |
 | `gh skill publish --dry-run` | GitHub's skill naming, frontmatter, and metadata checks |
-| `npx @anthropic-ai/claude-code plugin validate . --strict` | Claude Code plugin and marketplace manifests |
 
-`gh skill publish --dry-run` validates without publishing and needs no write access, so
-it runs as a plain lint step.
+The validator script is in this repository and uses only the Python standard library.
+`gh skill` is a built-in command of the `gh` CLI, which is preinstalled on
+GitHub-hosted runners, so the step installs no extension. `--dry-run` validates
+without publishing, so it needs no write access.
 
-The workflow also parses all five manifests, checks that the fields they share agree,
+A third workflow, `.github/workflows/supply-chain.yml`, enforces
+[AGENTS.md §1.4](AGENTS.md#14-verified-pinned-dependencies) against this repository's
+own CI: every action approved and pinned to a commit SHA, no fetch-and-execute, no
+unpinned installs, and explicit token scopes on every job. It parses the workflow YAML
+and walks `jobs` → `steps`, so a folded block scalar can't hide a piped installer
+across a line break. `.github/scripts/test-supply-chain.py` runs alongside it and
+proves the checker still rejects each class of bypass — folded-scalar pipes,
+download-then-run, shell line continuations, mutable tags, unapproved publishers,
+container tags, external reusable workflows, and checkout inputs that pull in another
+repository.
+
+These checks are tripwires, not a root of trust: a pull request can edit them in the
+same diff that weakens a workflow. The controls that actually bind live outside the
+pull request — [branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches),
+[CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
+on `.github/**`, and
+[action permissions policy](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository).
+
+CI previously fetched and ran `npx @anthropic-ai/claude-code plugin validate . --strict`.
+That step is gone, per §1.4 — a package runner in CI is fetch-and-execute of third-party
+code on every run. The rules that validator enforced were reproduced in
+`validate-manifests.py` instead: component paths must be `./`-prefixed, `agents` must
+name a `*.agent.md` file rather than a directory, and a Claude marketplace entry must
+not declare `agents`.
+
+The validator also parses all five manifests, checks that the fields they share agree,
 confirms every path a manifest points at exists, and validates each `agents/*.agent.md`
 file against the
 [custom agent schema](https://docs.github.com/en/copilot/reference/custom-agents-configuration):

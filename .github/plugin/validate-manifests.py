@@ -63,6 +63,31 @@ def check_paths(rel, declared, field):
             fail(f"{rel}: {field} points at '{raw}', which doesn't exist")
 
 
+# Portability rules recreated from the observed behavior of
+# `claude plugin validate --strict` (claude-code 2.1.218, checked 2026-07-30), so
+# CI keeps this coverage without fetching and executing that tool:
+#   - declared component paths must be './'-prefixed
+#   - 'agents' must name a *.agent.md file; a bare directory is rejected, even
+#     though Copilot CLI accepts one
+#   - Claude's marketplace plugin entry schema has no 'agents' field at all
+CLAUDE_MARKETPLACE = ".claude-plugin/marketplace.json"
+
+
+def check_component_shape(rel, declared, field):
+    for raw in as_list(declared):
+        if not raw.startswith("./"):
+            fail(f"{rel}: {field} '{raw}' must start with './'")
+        target = ROOT / raw.removeprefix("./").rstrip("/")
+        if field == "agents":
+            if not raw.endswith(".agent.md"):
+                fail(f"{rel}: agents '{raw}' must name a *.agent.md file - a "
+                     f"directory is rejected by Claude's schema")
+            elif target.exists() and not target.is_file():
+                fail(f"{rel}: agents '{raw}' is not a file")
+        elif field == "skills" and target.exists() and not target.is_dir():
+            fail(f"{rel}: skills '{raw}' must be a directory")
+
+
 plugins = {rel: load(rel) for rel in PLUGIN_MANIFESTS}
 markets = {rel: load(rel) for rel in MARKETPLACE_MANIFESTS}
 
@@ -89,6 +114,8 @@ for rel, manifest in plugins.items():
         fail(f"{rel}: 'name' is required")
     check_paths(rel, manifest.get("skills"), "skills")
     check_paths(rel, manifest.get("agents"), "agents")
+    check_component_shape(rel, manifest.get("skills"), "skills")
+    check_component_shape(rel, manifest.get("agents"), "agents")
 
 for rel, manifest in markets.items():
     if not manifest:
@@ -102,6 +129,13 @@ for rel, manifest in markets.items():
         check_paths(rel, entry.get("source"), "source")
         check_paths(rel, entry.get("skills"), "skills")
         check_paths(rel, entry.get("agents"), "agents")
+        check_component_shape(rel, entry.get("skills"), "skills")
+        check_component_shape(rel, entry.get("agents"), "agents")
+        # Claude's marketplace entry schema has no 'agents' field; declaring one
+        # makes `claude plugin validate --strict` reject the whole marketplace.
+        if rel == CLAUDE_MARKETPLACE and "agents" in entry:
+            fail(f"{rel}: plugin '{entry.get('name')}' declares 'agents', which "
+                 f"isn't in Claude's marketplace schema - declare it in plugin.json")
 
 names = {rel: sorted(p.get("name", "") for p in m.get("plugins", []))
          for rel, m in markets.items() if m}
