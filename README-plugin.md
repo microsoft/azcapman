@@ -158,12 +158,17 @@ download-then-run, shell line continuations, mutable tags, unapproved publishers
 container tags, external reusable workflows, and checkout inputs that pull in another
 repository.
 
-These checks are tripwires, not a root of trust: a pull request can edit them in the
-same diff that weakens a workflow. The controls that actually bind live outside the
-pull request — [branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches),
+On their own these checks would be tripwires rather than a root of trust, since a pull
+request can edit them in the same diff that weakens a workflow. On `main` they're backed
+by controls that sit outside the pull request:
+[branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
+makes `validate` and `check` required status checks and blocks force pushes, and the
+repository
+[actions permissions policy](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository)
+requires every action to be pinned to a full-length commit SHA and allows only
+GitHub-owned actions, which GitHub applies before a run starts.
 [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
-on `.github/**`, and
-[action permissions policy](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository).
+on `.github/**` names the reviewers GitHub notifies on a change to CI.
 
 CI previously fetched and ran `npx @anthropic-ai/claude-code plugin validate . --strict`.
 That step is gone, per §1.4 — a package runner in CI is fetch-and-execute of third-party
