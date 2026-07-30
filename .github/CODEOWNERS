@@ -1,0 +1,29 @@
+# Code owners for microsoft/azcapman.
+#
+# GitHub requests a review from these owners whenever a pull request touches a
+# matching path. Once a repository admin enables "Require review from Code Owners"
+# on the default branch, that approval becomes mandatory:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Why these paths: AGENTS.md rule 1.4 treats the checked-in supply chain checks as
+# tripwires rather than enforcement, because a pull request can weaken a checker and
+# the workflow it guards in the same diff. Reviewer gating on these paths is what
+# makes that diff visible to a human. GitHub recommends the same approach for
+# workflow files:
+# https://docs.github.com/en/actions/reference/security/secure-use#using-codeowners-to-monitor-changes
+#
+# Owners are the accounts that currently hold write access or higher on this
+# repository. Two are listed so that a code owner other than the pull request author
+# is always available to approve.
+
+# CI definitions, the scripts CI executes, and the plugin manifests under .github.
+/.github/ @MSBrett @ricmmartins
+
+# The repository constitution, including the supply chain rules in section 1.4.
+/AGENTS.md @MSBrett @ricmmartins
+
+# Manifests and the agent file that determine what ships to anyone installing this
+# repository as a plugin.
+/.claude-plugin/ @MSBrett @ricmmartins
+/.codex-plugin/ @MSBrett @ricmmartins
+/agents/ @MSBrett @ricmmartins

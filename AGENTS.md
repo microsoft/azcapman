@@ -129,6 +129,11 @@ these files will first require approval from a designated reviewer" — and the
 repository or organization
 [policy that requires actions to be pinned to a full-length commit SHA](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository).
 
+`.github/CODEOWNERS` declares the owners. It requests review on its own, but only
+becomes mandatory once a repository admin turns on "Require review from Code Owners"
+for the default branch. Writing the rule down here doesn't enforce it; that setting
+does.
+
 This rule governs this repository's own automation.
 [1.2](#12-no-operations-no-best-practices-no-opinions) constrains the subject-matter
 content this repository publishes about Azure; it doesn't stop this document from
