@@ -67,6 +67,24 @@ in `MANIFEST.md`'s mapping table — it does not cover `MANIFEST.md` itself or a
 repository-authored text (for example, `SKILL.md`'s routing table), which remain fully
 governed by this document.
 
+### 1.4 Verified, pinned dependencies
+
+This repository's CI, scripts, and packaging execute third-party code. Every such
+dependency is a supply chain entry point into anyone who clones or installs this
+repository.
+
+- Verify publisher identity **before** adding any package to CI, a script, or the
+  docs — author, source repository, and publish history. A `0.x` release published
+  under a personal email address is not first-party, however official its name and
+  keywords look.
+- Pin exact versions. `@latest`, floating tags, and unpinned action refs let CI
+  auto-execute releases that nobody reviewed.
+- Never describe a dependency as "first-party," "official," or "Microsoft" without a
+  link that proves it. That's a factual claim, so [1.1](#11-no-fabrication--everything-links-to-a-canonical-source)
+  applies to it in full.
+- Do not inherit trust from an entry that's already here. A dependency present in the
+  repository has not necessarily been vetted.
+
 ## 2. Mission
 
 This repository documents estate-level Azure quota, capacity, reservation,
@@ -183,3 +201,5 @@ Before considering any documentation change complete, confirm:
 - [ ] Terminology matches `docs/operations/glossary.md`; new terms added there first
 - [ ] New pages added to the relevant `toc.yml`
 - [ ] Citation matrix regenerated if citations changed
+- [ ] Any new third-party dependency has a verified publisher and a pinned version
+      ([1.4](#14-verified-pinned-dependencies))
