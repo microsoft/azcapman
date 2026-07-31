@@ -127,7 +127,7 @@ Create an [Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/ov
   - FR-8.2: The system shall provide a SKILL.md with procedural guidance for quota analysis, capacity reservation management, quota group operations, and Azure capacity evidence mapped to FinOps Framework capabilities, reusing content from the existing `azure-capacity-management` skill.
 
 - FR-9: SRE Agent subagent
-  - FR-9.1: The system shall provide a [subagent YAML definition](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) (`capacity-manager`) with system prompt, tool declarations, handoff description, and `Review` mode permissions.
+  - FR-9.1: The system shall provide a [subagent YAML definition](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) (`capacity-manager`) with instructions, tool declarations, and a handoff description.
   - FR-9.2: The subagent shall support Azure capacity evidence for Planning & Estimating, Forecasting, Architecting & Workload Placement, Usage Optimization, Rate Optimization, Governance, Policy & Risk, and Automation, Tools & Services via Azure CLI tools and Azure Resource Graph queries.
 
 - FR-10: Notifications
@@ -138,7 +138,7 @@ Create an [Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/ov
 
 - NFR-8.1: SRE Agent artifacts shall live under `sre-agent/` in the repository root.
 - NFR-8.2: SKILL.md content shall reuse existing `azure-capacity-management` skill content where applicable, adapted for SRE Agent's Azure CLI-based runtime.
-- NFR-8.3: The subagent shall use `Review` [agent type](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) (proposes actions, requires human approval for write operations).
+- NFR-8.3: The subagent's instructions shall require it to propose actions and wait for explicit human approval before write operations. [Run modes](https://learn.microsoft.com/en-us/azure/sre-agent/run-modes) are set on the response plan or scheduled task, not in the subagent YAML.
 - NFR-8.4: Notification templates shall follow AGENTS.md style guide and use HTML format for Teams messages.
 - NFR-8.5: All SRE Agent artifacts shall include [Microsoft Learn](https://learn.microsoft.com/) citations per AGENTS.md requirements.
 - NFR-8.6: The plugin shall not require a custom MCP server—it shall use SRE Agent's [built-in tools](https://learn.microsoft.com/en-us/azure/sre-agent/tools) (Azure CLI, Resource Graph, Python code interpreter).
