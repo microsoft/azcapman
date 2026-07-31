@@ -13,6 +13,9 @@ permissions:
   contents: read
 
 jobs:
+  # This job id is the required status check context on main. Renaming it leaves that
+  # context permanently unreported, so every pull request hangs on "Expected" and can't
+  # merge - and repairing it needs admin on the repository.
   check:
     runs-on: ubuntu-latest
     steps:
