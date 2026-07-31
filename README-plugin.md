@@ -168,7 +168,8 @@ repository
 requires every action to be pinned to a full-length commit SHA and allows only
 GitHub-owned actions, which GitHub applies before a run starts.
 [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
-on `.github/**` names the reviewers GitHub notifies on a change to CI.
+on `.github/**` routes an outside contributor's CI change to the maintainer. Code
+owner review isn't required on this repository, so it notifies rather than blocks.
 
 CI previously fetched and ran `npx @anthropic-ai/claude-code plugin validate . --strict`.
 That step is gone, per §1.4 — a package runner in CI is fetch-and-execute of third-party

@@ -1,29 +1,31 @@
 # Code owners for microsoft/azcapman.
 #
 # GitHub requests a review from these owners whenever a pull request touches a
-# matching path. Once a repository admin enables "Require review from Code Owners"
-# on the default branch, that approval becomes mandatory:
+# matching path:
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 #
 # Why these paths: AGENTS.md rule 1.4 treats the checked-in supply chain checks as
 # tripwires rather than enforcement, because a pull request can weaken a checker and
-# the workflow it guards in the same diff. Reviewer gating on these paths is what
-# makes that diff visible to a human. GitHub recommends the same approach for
-# workflow files:
+# the workflow it guards in the same diff. GitHub recommends code owners on workflow
+# files for that reason:
 # https://docs.github.com/en/actions/reference/security/secure-use#using-codeowners-to-monitor-changes
 #
-# Owners are the accounts that currently hold write access or higher on this
-# repository. Two are listed so that a code owner other than the pull request author
-# is always available to approve.
+# What this does and doesn't do here. "Require review from Code Owners" is off on the
+# default branch, so this notifies rather than blocks. GitHub doesn't request a review
+# from the author of a pull request, so on a pull request opened by the maintainer
+# below it does nothing at all. Its effect is to notify that maintainer when anyone
+# else proposes a change to CI, to the constitution, or to what ships as a plugin.
+# The required status checks and the pinned-SHA actions policy are what enforce
+# rule 1.4.
 
 # CI definitions, the scripts CI executes, and the plugin manifests under .github.
-/.github/ @MSBrett @ricmmartins
+/.github/ @MSBrett
 
 # The repository constitution, including the supply chain rules in section 1.4.
-/AGENTS.md @MSBrett @ricmmartins
+/AGENTS.md @MSBrett
 
 # Manifests and the agent file that determine what ships to anyone installing this
 # repository as a plugin.
-/.claude-plugin/ @MSBrett @ricmmartins
-/.codex-plugin/ @MSBrett @ricmmartins
-/agents/ @MSBrett @ricmmartins
+/.claude-plugin/ @MSBrett
+/.codex-plugin/ @MSBrett
+/agents/ @MSBrett
