@@ -20,9 +20,6 @@
     "finops",
     "isv"
   ],
-  "agents": [
-    "./agents/azure-capacity-manager.agent.md"
-  ],
   "skills": [
     "./skills/azure-capacity-management"
   ]

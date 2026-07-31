@@ -70,7 +70,17 @@ def check_paths(rel, declared, field):
 #   - 'agents' must name a *.agent.md file; a bare directory is rejected, even
 #     though Copilot CLI accepts one
 #   - Claude's marketplace plugin entry schema has no 'agents' field at all
+#
+# Claude Code discovers agents from the agents/ directory, not from the manifest.
+# Measured on claude-code 2.1.218 (2026-07-31) by installing four probe plugins that
+# differed only in this field: with 'agents' naming a file the plugin installs and
+# reports Agents (0), and with the field absent the same file loads as Agents (1).
+# Pointing 'agents' at a directory is rejected outright, so for Claude there is no
+# form of this field that works - it either validates and silently drops the agent,
+# or fails validation. Copilot CLI does consume its own manifest's 'agents' array,
+# so the field stays in .github/plugin/plugin.json and is banned here.
 CLAUDE_MARKETPLACE = ".claude-plugin/marketplace.json"
+CLAUDE_PLUGIN = ".claude-plugin/plugin.json"
 
 
 def check_component_shape(rel, declared, field):
@@ -116,6 +126,10 @@ for rel, manifest in plugins.items():
     check_paths(rel, manifest.get("agents"), "agents")
     check_component_shape(rel, manifest.get("skills"), "skills")
     check_component_shape(rel, manifest.get("agents"), "agents")
+    # Declaring this makes Claude Code load no agents at all. See the note above.
+    if rel == CLAUDE_PLUGIN and "agents" in manifest:
+        fail(f"{rel}: declares 'agents', which stops Claude Code discovering any "
+             f"agent - remove the field and let it read the agents/ directory")
 
 for rel, manifest in markets.items():
     if not manifest:
@@ -135,7 +149,8 @@ for rel, manifest in markets.items():
         # makes `claude plugin validate --strict` reject the whole marketplace.
         if rel == CLAUDE_MARKETPLACE and "agents" in entry:
             fail(f"{rel}: plugin '{entry.get('name')}' declares 'agents', which "
-                 f"isn't in Claude's marketplace schema - declare it in plugin.json")
+                 f"isn't in Claude's marketplace schema - Claude reads the "
+                 f"agents/ directory, so no manifest here should declare it")
 
 names = {rel: sorted(p.get("name", "") for p in m.get("plugins", []))
          for rel, m in markets.items() if m}
