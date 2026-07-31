@@ -29,6 +29,15 @@ Add this repository as a marketplace, then install the plugin:
 Manifests: `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`, per the
 [Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference).
 
+This installs one skill and one agent. Claude Code takes the agent's name from its
+filename, so the file this repository shares with Copilot CLI —
+`agents/azure-capacity-manager.agent.md`, named `*.agent.md` because that's what
+Copilot CLI requires — loads here as `azure-capacity-manager.agent`:
+
+```
+@azure-capacity-management:azure-capacity-manager.agent
+```
+
 ### GitHub Copilot CLI
 
 Add this repository as a plugin marketplace, then install the plugin:
@@ -175,8 +184,9 @@ CI previously fetched and ran `npx @anthropic-ai/claude-code plugin validate . -
 That step is gone, per §1.4 — a package runner in CI is fetch-and-execute of third-party
 code on every run. The rules that validator enforced were reproduced in
 `validate-manifests.py` instead: component paths must be `./`-prefixed, `agents` must
-name a `*.agent.md` file rather than a directory, and a Claude marketplace entry must
-not declare `agents`.
+name a `*.agent.md` file rather than a directory, and neither Claude manifest may
+declare `agents` at all — Claude Code discovers agents from the `agents/` directory,
+and declaring the field makes it load none.
 
 The validator also parses all five manifests, checks that the fields they share agree,
 confirms every path a manifest points at exists, and validates each `agents/*.agent.md`
