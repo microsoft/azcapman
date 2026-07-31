@@ -99,6 +99,14 @@ access to all secrets configured on your repository, and may be able to use the
   by pin — adding one means adding it to the list in
   `.github/scripts/check-supply-chain.py`, which is a review decision. The same risks
   apply to reusable workflows sourced from other repositories.
+- **Check what a composite action calls internally.** The pin requirement applies
+  transitively, so a composite action that references its own dependencies by tag is
+  refused before the run starts, even when every `uses:` in this repository is pinned
+  and the nested action is GitHub-owned. `actions/upload-pages-artifact` v3 called
+  `actions/upload-artifact@v4` that way and broke the docs deploy; v5.0.0 pins it.
+  Before adding or upgrading an action, read its `action.yml` at the SHA being pinned
+  and confirm any `uses:` inside it is also pinned. A checker that reads only this
+  repository's workflow files can't see this.
 - **Give every job an explicit `permissions:` block.** GitHub states it's "good
   security practice to set the default permission for the `GITHUB_TOKEN` to read
   access only for repository contents," raised per job only as required.
@@ -121,8 +129,8 @@ access to all secrets configured on your repository, and may be able to use the
 `.github/scripts/check-supply-chain.py` checks these mechanically, and
 `.github/scripts/test-supply-chain.py` covers each rule with a case that must fail.
 On their own they'd be tripwires rather than a root of trust, because a pull request
-can edit them in the same diff that weakens a workflow. Three controls outside the
-pull request close that gap on `main`:
+can edit them in the same diff that weakens a workflow. Two controls outside the pull
+request close that gap on `main`:
 
 - [Branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
   requires a pull request, blocks force pushes and branch deletion, requires linear
@@ -132,15 +140,15 @@ pull request close that gap on `main`:
   requires every action to be pinned to a full-length commit SHA and allows only
   GitHub-owned actions. GitHub applies this before a run starts, so it holds even for
   a pull request that edits the checker.
-- [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
-  on `.github/**` names the reviewers GitHub notifies, which it recommends so "any
-  proposed changes to these files will first require approval from a designated
-  reviewer."
 
-`.github/CODEOWNERS` declares the owners. It requests review on its own, but only
-becomes mandatory once a repository admin turns on "Require review from Code Owners"
-for the default branch. That setting is off, so CODEOWNERS currently notifies rather
-than blocks. Writing the rule down here doesn't enforce it; that setting does.
+[CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
+on `.github/**` and `AGENTS.md` is a third, weaker signal. GitHub recommends it so
+"any proposed changes to these files will first require approval from a designated
+reviewer," but that only holds once a repository admin turns on "Require review from
+Code Owners" for the default branch. That setting is off, so `.github/CODEOWNERS`
+notifies rather than blocks — and because GitHub doesn't request a review from a pull
+request's own author, it does nothing at all on a pull request opened by the
+maintainer it names. Treat it as routing for an outside contribution, not as a gate.
 
 This rule governs this repository's own automation.
 [1.2](#12-no-operations-no-best-practices-no-opinions) constrains the subject-matter
