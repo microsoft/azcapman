@@ -76,13 +76,24 @@ def check_paths(rel, declared, field):
 # (SKILL.md files)", defaulting to 'skills/', with the example
 # '"skills": ["skills/", "extra-skills/"]':
 # https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference
-# Claude Code documents the matching 'skills/<name>/SKILL.md' layout:
-# https://code.claude.com/docs/en/plugins-reference
 # All seven plugins in Microsoft's reference marketplace Azure/sre-agent-plugins
 # declare exactly ["skills/"]. Azure SRE Agent, whose plugin component model is at
 # https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace, returned
 # 'no_skills_found' for the './'-prefixed skill-directory form when measured
-# against a live agent on 2026-08-05.
+# against a live agent on 2026-08-05, and imported the skill once the container
+# form was used.
+#
+# Claude Code is the exception, and takes no 'skills' field at all. It documents
+# the same 'skills/<name>/SKILL.md' layout as a discovery convention rather than a
+# manifest value - "Location: skills/ directory in plugin root":
+# https://code.claude.com/docs/en/plugins-reference
+# Measured on claude-code 2.1.161 against a live install from microsoft/azcapman on
+# 2026-08-05: the container form is rejected outright with "This plugin uses a
+# source type your Claude Code version does not support", while removing the field
+# installs and reports Skills (1). The explicit array is read as a list of skill
+# *sources*, so a directory holding no SKILL.md of its own falls through to a
+# source-type resolver and fails. This is the same shape as the 'agents' finding
+# below, and the same remedy: omit the field and let discovery run.
 #
 # Claude Code discovers agents from the agents/ directory, not from the manifest.
 # Measured on claude-code 2.1.218 (2026-07-31) by installing four probe plugins that
@@ -120,7 +131,10 @@ for field in ("name", "version", "description"):
     if len(set(seen.values())) > 1:
         fail(f"plugin manifests disagree on '{field}': {seen}")
 
-skill_sets = {rel: norm_paths(m.get("skills")) for rel, m in plugins.items() if m}
+# Only manifests that declare 'skills' are compared; Claude Code must not (see the
+# note above), so its absence is deliberate rather than a disagreement.
+skill_sets = {rel: norm_paths(m.get("skills"))
+              for rel, m in plugins.items() if m and "skills" in m}
 if len(set(map(tuple, skill_sets.values()))) > 1:
     fail(f"plugin manifests disagree on 'skills': {skill_sets}")
 
@@ -143,6 +157,11 @@ for rel, manifest in plugins.items():
     if rel == CLAUDE_PLUGIN and "agents" in manifest:
         fail(f"{rel}: declares 'agents', which stops Claude Code discovering any "
              f"agent - remove the field and let it read the agents/ directory")
+    # Declaring this makes Claude Code refuse the install outright. See the note above.
+    if rel == CLAUDE_PLUGIN and "skills" in manifest:
+        fail(f"{rel}: declares 'skills', which makes Claude Code reject the install "
+             f"as an unsupported source type - remove the field and let it read the "
+             f"skills/ directory")
 
 for rel, manifest in markets.items():
     if not manifest:
@@ -164,6 +183,12 @@ for rel, manifest in markets.items():
             fail(f"{rel}: plugin '{entry.get('name')}' declares 'agents', which "
                  f"isn't in Claude's marketplace schema - Claude reads the "
                  f"agents/ directory, so no manifest here should declare it")
+        # Same reasoning for 'skills': Claude discovers skills/ rather than reading
+        # a manifest value, and the container form is rejected. See the note above.
+        if rel == CLAUDE_MARKETPLACE and "skills" in entry:
+            fail(f"{rel}: plugin '{entry.get('name')}' declares 'skills', which "
+                 f"makes Claude Code reject the install as an unsupported source "
+                 f"type - remove the field and let it read the skills/ directory")
 
 names = {rel: sorted(p.get("name", "") for p in m.get("plugins", []))
          for rel, m in markets.items() if m}
