@@ -252,6 +252,11 @@ before using it in other content.
 - `agents/`, `skills/`, `sre-agent/` — packaging of this repository's content as an
   agent, skill, or SRE Agent plugin. These reference `docs/` and `scripts/` via
   symlinks or citations; they do not fork or restate the content.
+- Plugin and marketplace manifests must satisfy all four host formats:
+  - [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-marketplace)
+  - [Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
+  - [OpenAI Codex and ChatGPT](https://developers.openai.com/plugins/build/plugins)
+  - [Claude Code](https://code.claude.com/docs/en/plugin-marketplaces)
 - `done/` — completed task records for this repository's own build process, not
   end-user documentation.
 - Run `python scripts/generate_citation_matrix.py` after adding or changing
