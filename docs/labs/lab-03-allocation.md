@@ -32,7 +32,7 @@ Output is a CSV with columns: TenantId, SubscriptionId, Location, Family, Size, 
 
 - **CoresUsed**: vCPU count allocated (running VMs) plus deallocated VMs that still hold quota
 - **CoresTotal**: quota limit in the region
-- **RegionRestricted**: true if the SKU is region-locked and requires a support request to unlock
+- **RegionRestricted**: true if the SKU is region-locked and requires a support request to remove the restriction
 - **ZonesPresent**: true if the region has availability zones
 - **ZonesRestricted**: true if the SKU is restricted to certain zones
 
