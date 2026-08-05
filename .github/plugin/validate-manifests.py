@@ -66,10 +66,23 @@ def check_paths(rel, declared, field):
 # Portability rules recreated from the observed behavior of
 # `claude plugin validate --strict` (claude-code 2.1.218, checked 2026-07-30), so
 # CI keeps this coverage without fetching and executing that tool:
-#   - declared component paths must be './'-prefixed
-#   - 'agents' must name a *.agent.md file; a bare directory is rejected, even
-#     though Copilot CLI accepts one
+#   - 'agents' paths must be './'-prefixed, and must name a *.agent.md file; a bare
+#     directory is rejected, even though Copilot CLI accepts one
 #   - Claude's marketplace plugin entry schema has no 'agents' field at all
+#
+# 'skills' is exempt from the './' rule, because it names a *container* directory
+# whose immediate children are the skill directories - not a skill directory
+# itself. Copilot CLI documents the field as "Path(s) to skill directories
+# (SKILL.md files)", defaulting to 'skills/', with the example
+# '"skills": ["skills/", "extra-skills/"]':
+# https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference
+# Claude Code documents the matching 'skills/<name>/SKILL.md' layout:
+# https://code.claude.com/docs/en/plugins-reference
+# All seven plugins in Microsoft's reference marketplace Azure/sre-agent-plugins
+# declare exactly ["skills/"]. Azure SRE Agent, whose plugin component model is at
+# https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace, returned
+# 'no_skills_found' for the './'-prefixed skill-directory form when measured
+# against a live agent on 2026-08-05.
 #
 # Claude Code discovers agents from the agents/ directory, not from the manifest.
 # Measured on claude-code 2.1.218 (2026-07-31) by installing four probe plugins that
@@ -85,10 +98,10 @@ CLAUDE_PLUGIN = ".claude-plugin/plugin.json"
 
 def check_component_shape(rel, declared, field):
     for raw in as_list(declared):
-        if not raw.startswith("./"):
-            fail(f"{rel}: {field} '{raw}' must start with './'")
         target = ROOT / raw.removeprefix("./").rstrip("/")
         if field == "agents":
+            if not raw.startswith("./"):
+                fail(f"{rel}: {field} '{raw}' must start with './'")
             if not raw.endswith(".agent.md"):
                 fail(f"{rel}: agents '{raw}' must name a *.agent.md file - a "
                      f"directory is rejected by Claude's schema")
@@ -193,14 +206,29 @@ for path in agent_files:
     if f"{path.name.removesuffix('.agent.md')}" not in text[4:end]:
         fail(f"{rel}: frontmatter 'name' should match the file name")
 
-# The single published skill must exist and carry a SKILL.md.
+# Each declared 'skills' path is a container directory; its immediate children are
+# the published skill directories. Pin that published set, so a new directory under
+# skills/ - vendored upstream material in particular - can't silently start shipping
+# as a skill of this plugin.
+PUBLISHED_SKILLS = ["azure-capacity-management"]
+
 for rel, manifest in plugins.items():
     if not manifest:
         continue
     for skill in as_list(manifest.get("skills")):
         target = ROOT / skill.removeprefix("./").rstrip("/")
-        if target.is_dir() and not (target / "SKILL.md").is_file():
-            fail(f"{rel}: skill dir '{skill}' has no SKILL.md")
+        if not target.is_dir():
+            continue
+        published = sorted(
+            child.name
+            for child in target.iterdir()
+            if child.is_dir() and (child / "SKILL.md").is_file()
+        )
+        if not published:
+            fail(f"{rel}: skills '{skill}' holds no <name>/SKILL.md skill directory")
+        elif published != PUBLISHED_SKILLS:
+            fail(f"{rel}: skills '{skill}' publishes {published}, "
+                 f"expected {PUBLISHED_SKILLS}")
 
 if errors:
     print("Manifest validation failed:\n")
