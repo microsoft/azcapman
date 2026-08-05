@@ -141,7 +141,7 @@ Create an [Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/ov
 - NFR-8.3: The subagent's instructions shall require it to propose actions and wait for explicit human approval before write operations. [Run modes](https://learn.microsoft.com/en-us/azure/sre-agent/run-modes) are set on the response plan or scheduled task, not in the subagent YAML.
 - NFR-8.4: Notification templates shall follow AGENTS.md style guide and use HTML format for Teams messages.
 - NFR-8.5: All SRE Agent artifacts shall include [Microsoft Learn](https://learn.microsoft.com/) citations per AGENTS.md requirements.
-- NFR-8.6: The plugin shall not require a custom MCP server—it shall use SRE Agent's [built-in tools](https://learn.microsoft.com/en-us/azure/sre-agent/tools) (Azure CLI, Resource Graph, Python code interpreter).
+- NFR-8.6: The plugin shall not require a custom MCP server—it shall use SRE Agent's [built-in tools](https://learn.microsoft.com/en-us/azure/sre-agent/tools) (Azure CLI, Resource Graph).
 - NFR-8.7: A setup guide shall document how to deploy the skill, subagent, and connectors to an SRE Agent instance via the [Builder UI](https://learn.microsoft.com/en-us/azure/sre-agent/skills).
 
 ## SRE Agent sandbox lab
@@ -167,11 +167,11 @@ Integrate the [azure-sre-agent-sandbox](https://github.com/matthansen0/azure-sre
 - NFR-11.3: Infrastructure code shall be adapted from [azure-sre-agent-sandbox](https://github.com/matthansen0/azure-sre-agent-sandbox) (MIT license) with attribution.
 - NFR-11.4: A dev container configuration shall provide a consistent deployment experience.
 
-## One-click SRE Agent deployment with azd
+## SRE Agent plugin distribution
 
 ### Summary
 
-Package all 5 subagents, 3 skills, knowledge docs, and a Kusto MCP connector as an [Azure Developer CLI (azd)](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview) template. Customers run `azd up` to deploy a fully configured SRE Agent instance that connects to their FinOps Hub.
+Distribute this repository as an [Azure SRE Agent plugin](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace). A plugin contributes skills and MCP servers; [subagent](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) definitions aren't plugin components and are applied separately in the portal.
 
 ### Functional requirements
 
@@ -185,10 +185,10 @@ Package all 5 subagents, 3 skills, knowledge docs, and a Kusto MCP connector as 
   - FR-15.1: The system shall provide a Kusto MCP connector YAML that connects to a customer's FinOps Hub ADX cluster using the SRE Agent's managed identity.
   - FR-15.2: The Bicep deployment shall assign `AllDatabasesViewer` at the ADX server scope to the SRE Agent managed identity.
 
-- FR-16: Automated deployment
-  - FR-16.1: The system shall provide an `azure.yaml` template that deploys the full stack via `azd up`.
-  - FR-16.2: The system shall provide a `post-provision.sh` script that runs `srectl init`, uploads skills and knowledge docs, and applies all agent and connector YAML as an azd `postprovision` hook.
-  - FR-16.3: The README shall include a "Deploy to Azure" button that links to the Azure Portal custom deployment UI.
+- FR-16: Plugin distribution
+  - FR-16.1: The system shall provide `plugin.json` and `marketplace.json` in a [supported manifest location](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) so the repository installs as an SRE Agent plugin.
+  - FR-16.2: The system shall be installable through **Builder** > **Plugins** > **Install from URL**, which pins each installation to the exact git commit at install time, per the [plugin marketplace reference](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace).
+  - FR-16.3: The README shall document the plugin install path for each supported harness.
 
 ### Non-functional requirements
 

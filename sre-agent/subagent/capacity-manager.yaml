@@ -74,4 +74,3 @@ spec:
     - RunAzCliReadCommands
     - RunAzCliWriteCommands
     - GetAzCliHelp
-    - ExecutePythonCode
