@@ -21,7 +21,7 @@
         "./agents/azure-capacity-manager.agent.md"
       ],
       "skills": [
-        "./skills/azure-capacity-management"
+        "skills/"
       ],
       "keywords": [
         "azure",

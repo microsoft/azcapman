@@ -15,7 +15,7 @@
       "homepage": "https://github.com/microsoft/azcapman",
       "repository": "https://github.com/microsoft/azcapman",
       "skills": [
-        "./skills/azure-capacity-management"
+        "skills/"
       ],
       "keywords": [
         "azure",

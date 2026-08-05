@@ -21,6 +21,6 @@
     "isv"
   ],
   "skills": [
-    "./skills/azure-capacity-management"
+    "skills/"
   ]
 }
