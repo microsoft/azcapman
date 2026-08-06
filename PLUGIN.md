@@ -11,6 +11,17 @@ Per-harness canonical requirements for agent plugins and marketplaces, sourced f
 | Codex | Done | Tested (2026-08-06) — real online install: `codex plugin marketplace add microsoft/azcapman --ref main`, `codex plugin add azure-capacity-management@azcapman`. Required restoring `.codex-plugin/plugin.json` (missing from `main`, restored in `2601b18`) in addition to the `marketplace.json` added in `5fd7364`. Marketplace clone preserves the symlinks intact; the plugin-install cache-copy step silently drops all three, leaving the reference content completely absent with no error. See "Empirical test result" under Codex § Symlink handling |
 | Azure SRE Agent | Done | Tested (2026-08-06) — marketplace registration and standalone plugin import from `microsoft/azcapman` succeeded. The importer created one skill but no tool bindings; a complete-object data-plane PATCH attached the three Azure CLI tools. Marketplace registrations, installations, imported skills, and direct-deployment test resources were removed afterward. See Azure SRE Agent § Live data-plane verification |
 
+## Support matrix
+
+The matrix separates **documented** capability from this repository's **recorded online-install result**. `Unknown` means this repository hasn't tested the behavior; it doesn't mean the harness rejects it.
+
+| Harness | Skills | Plugin subagent | MCP configuration | This repo's `references/` symlinks | Skill tool binding after plugin import |
+| --- | --- | --- | --- | --- | --- |
+| Claude Code | Yes; live marketplace install loaded the skill. [Plugins reference](https://code.claude.com/docs/en/plugins-reference#skills) | Yes; live install loaded the plugin agent after removing the incompatible `agents` manifest field. [Plugins reference](https://code.claude.com/docs/en/plugins-reference#agents) | Yes. [Plugins reference](https://code.claude.com/docs/en/plugins-reference#mcp-servers) | Preserved as working relative symlinks. | Unknown |
+| GitHub Copilot CLI | Yes; live install loaded one skill. [Plugin reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference#pluginjson) | Yes; plugin agents use `*.agent.md`. [Plugin reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference#pluginjson) | Yes. [Plugin reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference#pluginjson) | Dereferenced into populated directories. | Unknown |
+| Codex | Yes; live install loaded the skill. [Build skills](https://learn.chatgpt.com/docs/build-skills) | No documented plugin-agent component; `agents/openai.yaml` is skill UI metadata, not a Codex subagent. [Build skills](https://learn.chatgpt.com/docs/build-skills) | Yes. [Package your plugin](https://developers.openai.com/plugins/build/plugins) | Dropped silently from the installed cache. | Unknown |
+| Azure SRE Agent | Yes; live standalone import loaded one skill. [Skills](https://learn.microsoft.com/en-us/azure/sre-agent/skills) | No; plugins contain skills and MCP integrations, while custom agents use a separate surface. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) | Yes; plugin installation records connector requirements, and connector setup is separate. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) | Unknown | Not automatic: import created an empty list; complete-object PATCH bound the three Azure CLI tools. |
+
 ## Claude Code
 
 ### Marketplace manifest
