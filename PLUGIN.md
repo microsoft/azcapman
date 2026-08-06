@@ -6,9 +6,9 @@ Per-harness canonical requirements for agent plugins and marketplaces, sourced f
 
 | Harness | Spec documented | Experiment status |
 | --- | --- | --- |
-| Claude Code | Done | Verified — real online install from GitHub: `claude plugin marketplace add microsoft/azcapman#restore-claude-copilot-plugins` (user scope, clones over HTTPS from `github.com/microsoft/azcapman`), `claude plugin install azure-capacity-management@azcapman` (installed, enabled, user scope, on-disk cache confirmed), then `claude plugin uninstall` and `claude plugin marketplace remove` (both confirmed removed). Tested against PR #30 branch `restore-claude-copilot-plugins`; will re-verify against `main` once merged |
-| GitHub Copilot CLI | Done | Failed — tested via `--plugin-dir .` (local dir), which is invalid per requirement to test the real online install path from GitHub. Install-from-repo not yet verified |
-| Codex | Done | Not started |
+| Claude Code | Done | Tested (2026-08-06) — real online install from `main`: `claude plugin marketplace add microsoft/azcapman`, `claude plugin install azure-capacity-management@azcapman`. Symlinks preserved as real relative symlinks with content correctly reachable through them. Cleaned up, no residue. See "Empirical test result" under Claude Code § Plugin caching and file resolution |
+| GitHub Copilot CLI | Done | Tested (2026-08-06) — real online install directly from the repo: `copilot plugin install microsoft/azcapman`. Succeeds; symlinks dereferenced into real, fully-populated directories (not symlinks, not empty). CLI itself warns direct repo installs are deprecated in favor of marketplace installs. Cleaned up, no residue. See "Empirical test result" under GitHub Copilot CLI § Install cache and symlink handling |
+| Codex | Done | Tested (2026-08-06) — real online install: `codex plugin marketplace add microsoft/azcapman --ref main`, `codex plugin add azure-capacity-management@azcapman`. Required restoring `.codex-plugin/plugin.json` (missing from `main`, restored in `2601b18`) in addition to the `marketplace.json` added in `5fd7364`. Marketplace clone preserves the symlinks intact; the plugin-install cache-copy step silently drops all three, leaving the reference content completely absent with no error. See "Empirical test result" under Codex § Symlink handling |
 | Azure SRE Agent | Done | Not started |
 
 ## Claude Code
@@ -86,6 +86,10 @@ Per-harness canonical requirements for agent plugins and marketplaces, sourced f
 - For plugins installed with `--plugin-dir` or from a local path, only symlinks whose targets resolve within the plugin's own directory are preserved, and all others are skipped ([Plugins reference](https://code.claude.com/docs/en/plugins-reference#plugin-caching-and-file-resolution)).
 - The plugin-caching section documents these cache-copy cases and the local-path rule, and it does not document any additional symlink tiers or any exception that allows out-of-plugin-directory references after installation ([Plugins reference](https://code.claude.com/docs/en/plugins-reference#plugin-caching-and-file-resolution)).
 
+#### Empirical test result (2026-08-06)
+
+Real online install from `main`: `claude plugin marketplace add microsoft/azcapman` (HTTPS clone), `claude plugin install azure-capacity-management@azcapman` (user scope). The plugin root recorded in `.claude-plugin/marketplace.json` is the whole repository, not just `skills/azure-capacity-management/`, so the three symlinks in `skills/azure-capacity-management/references/` (`docs`, `scripts`, `vendor`) all resolve to targets that are within that same copied root (`docs/`, `scripts/`, `skills/vendor/`). Observed result in `~/.claude/plugins/cache/azcapman/azure-capacity-management/1.0.0/`: all three are preserved as real relative symlinks (confirmed with `find -type l` and `readlink`), and each resolves to real, populated content copied alongside them in the same cache tree (confirmed by reading a file through the symlink path). This matches the first documented tier above, not the second — "plugin's own directory" is the whole copied plugin root here, not the individual skill subfolder. Cleaned up afterward: `claude plugin uninstall`, `claude plugin marketplace remove`, and the leftover `~/.claude/plugins/cache/azcapman` / `~/.claude/plugins/marketplaces/azcapman` directories were removed manually (uninstall does not delete them).
+
 ## Codex
 
 ### Skill structure
@@ -131,6 +135,13 @@ Codex reads skills from repository, user, admin, and system locations, and for r
 The documented wording is limited to symlinked skill folders while Codex scans the listed skill locations. [Build skills](https://learn.chatgpt.com/docs/build-skills)
 
 The page does not add a separate statement about symlinked files inside a skill directory. [Build skills](https://learn.chatgpt.com/docs/build-skills)
+
+#### Empirical test result (2026-08-06)
+
+This repo's case (real symlinks nested inside a skill directory: `skills/azure-capacity-management/references/{docs,scripts,vendor}`) is exactly the undocumented gap above. Real online test: `codex plugin marketplace add microsoft/azcapman --ref main`, then `codex plugin add azure-capacity-management@azcapman`. Result was split across two stages:
+
+- Marketplace clone (`~/.codex/.tmp/marketplaces/azcapman`): the three symlinks are preserved intact as real symlinks (`git status --short` clean, `find -type l` matches all three, `readlink` returns the original relative targets, content is reachable).
+- Plugin install/cache copy (`~/.codex/plugins/cache/azcapman/azure-capacity-management/1.0.0`): the same three symlinks are **silently dropped**. `references/docs`, `references/scripts`, and `references/vendor` do not exist at all in the installed copy — not as symlinks, not as dereferenced directories, not as broken links. No error or warning is printed. The installed `SKILL.md` still references this content, so an install via `codex plugin add` silently ships a skill missing all of its reference material. Confirmed the manifest itself (`.codex-plugin/plugin.json`) also has to exist for the install to succeed at all — restored from `449cf07^` in commit `2601b18` after it was found missing from `main` (it had not been restored in PR #30, only the marketplace pointer had been added). Cleaned up afterward: `codex plugin remove`, `codex plugin marketplace remove azcapman`, confirmed no residue in `codex plugin list` / `codex plugin marketplace list`.
 
 ### Plugin and marketplace packaging
 
@@ -279,6 +290,10 @@ The same Open Plugin Spec section documents LSP server configuration in `lsp-con
 The plugin creation guide says that installed plugin components are cached, that subsequent sessions read from that cache, and that local plugin changes require reinstalling the plugin to pick them up. [Creating a plugin for GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-creating)
 
 Across the GitHub Copilot CLI pages cited in this section, no page mentions symlink handling during plugin installation or plugin caching. [Creating a plugin for GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-creating) [GitHub Copilot CLI plugin reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference) [Creating a plugin marketplace for GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-marketplace)
+
+#### Empirical test result (2026-08-06)
+
+Real online install directly from the GitHub repo: `copilot plugin install microsoft/azcapman`. This printed `Plugin "azure-capacity-management" installed successfully. Installed 1 skill.` plus a live deprecation warning not covered by any cited doc page: `Direct plugin installs (repos, URLs, local paths) are deprecated. Only plugin@marketplace installs will be supported in a future release.` Installed at `~/.copilot/installed-plugins/_direct/microsoft--azcapman/`. The three symlinks (`skills/azure-capacity-management/references/{docs,scripts,vendor}`) are not present as symlinks at all (`find -type l` empty); each is a real directory containing the full, real dereferenced content of its target (confirmed populated, not empty or stubbed). This is dereference-and-copy, distinct from both Claude Code's symlink-preservation result and Codex's silent-drop result. Cleaned up afterward with `copilot plugin uninstall`.
 
 ## Azure SRE Agent
 
