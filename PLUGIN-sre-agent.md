@@ -88,3 +88,24 @@ The page also says that if the agent needs a skill's tools after the skill unloa
 ### Symlink handling
 
 None of these three Microsoft Learn pages mentions symlink handling for plugin content, custom-agent content, skill content, or manifest resolution. [Plugin marketplace, 2026-06-02, f85079a3a3df6f64ede19ec060b0fc465d43cf65](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) [Custom agents, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) [Skills, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
+
+### REST deployment verification
+
+On 2026-08-06, `sre-agent/scripts/deploy-capacity-manager.sh` deployed the
+`azure-capacity-management` skill and `capacity-manager` custom agent to the
+live non-production `azcapman-sre` agent through the documented v2 data plane.
+The script uses `PUT /api/v2/extendedAgent/skills/{name}` and
+`PUT /api/v2/extendedAgent/agents/{name}` and receives its data-plane token for
+the `https://azuresre.dev` audience. [Azure SRE Agent API
+reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
+
+The subsequent `GET` responses returned `Skill` and `ExtendedAgent` resources
+with the expected tool lists. The skill contained 1,523 characters of
+`skillContent`; the custom agent contained 1,753 characters of instructions,
+enabled `azure-capacity-management`, and returned a 307-character
+`handoffDescription`.
+
+This test deployed a skill and custom agent directly. It did not validate a
+plugin marketplace install. The plugin marketplace remains limited to skills and
+MCP integrations, while custom agents use the separate data-plane `agents`
+resource. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) [Azure SRE Agent API reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
