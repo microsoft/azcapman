@@ -66,34 +66,10 @@ def check_paths(rel, declared, field):
 # Portability rules recreated from the observed behavior of
 # `claude plugin validate --strict` (claude-code 2.1.218, checked 2026-07-30), so
 # CI keeps this coverage without fetching and executing that tool:
-#   - 'agents' paths must be './'-prefixed, and must name a *.agent.md file; a bare
-#     directory is rejected, even though Copilot CLI accepts one
+#   - declared component paths must be './'-prefixed
+#   - 'agents' must name a *.agent.md file; a bare directory is rejected, even
+#     though Copilot CLI accepts one
 #   - Claude's marketplace plugin entry schema has no 'agents' field at all
-#
-# 'skills' is exempt from the './' rule, because it names a *container* directory
-# whose immediate children are the skill directories - not a skill directory
-# itself. Copilot CLI documents the field as "Path(s) to skill directories
-# (SKILL.md files)", defaulting to 'skills/', with the example
-# '"skills": ["skills/", "extra-skills/"]':
-# https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference
-# All seven plugins in Microsoft's reference marketplace Azure/sre-agent-plugins
-# declare exactly ["skills/"]. Azure SRE Agent, whose plugin component model is at
-# https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace, returned
-# 'no_skills_found' for the './'-prefixed skill-directory form when measured
-# against a live agent on 2026-08-05, and imported the skill once the container
-# form was used.
-#
-# Claude Code is the exception, and takes no 'skills' field at all. It documents
-# the same 'skills/<name>/SKILL.md' layout as a discovery convention rather than a
-# manifest value - "Location: skills/ directory in plugin root":
-# https://code.claude.com/docs/en/plugins-reference
-# Measured on claude-code 2.1.161 against a live install from microsoft/azcapman on
-# 2026-08-05: the container form is rejected outright with "This plugin uses a
-# source type your Claude Code version does not support", while removing the field
-# installs and reports Skills (1). The explicit array is read as a list of skill
-# *sources*, so a directory holding no SKILL.md of its own falls through to a
-# source-type resolver and fails. This is the same shape as the 'agents' finding
-# below, and the same remedy: omit the field and let discovery run.
 #
 # Claude Code discovers agents from the agents/ directory, not from the manifest.
 # Measured on claude-code 2.1.218 (2026-07-31) by installing four probe plugins that
@@ -109,10 +85,10 @@ CLAUDE_PLUGIN = ".claude-plugin/plugin.json"
 
 def check_component_shape(rel, declared, field):
     for raw in as_list(declared):
+        if not raw.startswith("./"):
+            fail(f"{rel}: {field} '{raw}' must start with './'")
         target = ROOT / raw.removeprefix("./").rstrip("/")
         if field == "agents":
-            if not raw.startswith("./"):
-                fail(f"{rel}: {field} '{raw}' must start with './'")
             if not raw.endswith(".agent.md"):
                 fail(f"{rel}: agents '{raw}' must name a *.agent.md file - a "
                      f"directory is rejected by Claude's schema")
@@ -131,10 +107,7 @@ for field in ("name", "version", "description"):
     if len(set(seen.values())) > 1:
         fail(f"plugin manifests disagree on '{field}': {seen}")
 
-# Only manifests that declare 'skills' are compared; Claude Code must not (see the
-# note above), so its absence is deliberate rather than a disagreement.
-skill_sets = {rel: norm_paths(m.get("skills"))
-              for rel, m in plugins.items() if m and "skills" in m}
+skill_sets = {rel: norm_paths(m.get("skills")) for rel, m in plugins.items() if m}
 if len(set(map(tuple, skill_sets.values()))) > 1:
     fail(f"plugin manifests disagree on 'skills': {skill_sets}")
 
@@ -157,11 +130,6 @@ for rel, manifest in plugins.items():
     if rel == CLAUDE_PLUGIN and "agents" in manifest:
         fail(f"{rel}: declares 'agents', which stops Claude Code discovering any "
              f"agent - remove the field and let it read the agents/ directory")
-    # Declaring this makes Claude Code refuse the install outright. See the note above.
-    if rel == CLAUDE_PLUGIN and "skills" in manifest:
-        fail(f"{rel}: declares 'skills', which makes Claude Code reject the install "
-             f"as an unsupported source type - remove the field and let it read the "
-             f"skills/ directory")
 
 for rel, manifest in markets.items():
     if not manifest:
@@ -183,12 +151,6 @@ for rel, manifest in markets.items():
             fail(f"{rel}: plugin '{entry.get('name')}' declares 'agents', which "
                  f"isn't in Claude's marketplace schema - Claude reads the "
                  f"agents/ directory, so no manifest here should declare it")
-        # Same reasoning for 'skills': Claude discovers skills/ rather than reading
-        # a manifest value, and the container form is rejected. See the note above.
-        if rel == CLAUDE_MARKETPLACE and "skills" in entry:
-            fail(f"{rel}: plugin '{entry.get('name')}' declares 'skills', which "
-                 f"makes Claude Code reject the install as an unsupported source "
-                 f"type - remove the field and let it read the skills/ directory")
 
 names = {rel: sorted(p.get("name", "") for p in m.get("plugins", []))
          for rel, m in markets.items() if m}
@@ -231,29 +193,14 @@ for path in agent_files:
     if f"{path.name.removesuffix('.agent.md')}" not in text[4:end]:
         fail(f"{rel}: frontmatter 'name' should match the file name")
 
-# Each declared 'skills' path is a container directory; its immediate children are
-# the published skill directories. Pin that published set, so a new directory under
-# skills/ - vendored upstream material in particular - can't silently start shipping
-# as a skill of this plugin.
-PUBLISHED_SKILLS = ["azure-capacity-management"]
-
+# The single published skill must exist and carry a SKILL.md.
 for rel, manifest in plugins.items():
     if not manifest:
         continue
     for skill in as_list(manifest.get("skills")):
         target = ROOT / skill.removeprefix("./").rstrip("/")
-        if not target.is_dir():
-            continue
-        published = sorted(
-            child.name
-            for child in target.iterdir()
-            if child.is_dir() and (child / "SKILL.md").is_file()
-        )
-        if not published:
-            fail(f"{rel}: skills '{skill}' holds no <name>/SKILL.md skill directory")
-        elif published != PUBLISHED_SKILLS:
-            fail(f"{rel}: skills '{skill}' publishes {published}, "
-                 f"expected {PUBLISHED_SKILLS}")
+        if target.is_dir() and not (target / "SKILL.md").is_file():
+            fail(f"{rel}: skill dir '{skill}' has no SKILL.md")
 
 if errors:
     print("Manifest validation failed:\n")

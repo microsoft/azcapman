@@ -136,20 +136,10 @@ sre-agent/                                     # ExtendedAgent subagent YAML, a 
                                                # in-portal mechanism, not plugin install
 ```
 
-The `skills` field names a container directory whose immediate children are the
-published skill directories, which is the default and documented form for
-[Copilot CLI](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference)
-and the form all seven plugins in
-[`Azure/sre-agent-plugins`](https://github.com/Azure/sre-agent-plugins) declare.
-Azure SRE Agent imports the skill only in that form. Claude Code is the exception and
-declares no `skills` field at all: it treats `skills/` as a discovery convention rather
-than a manifest value, per the
-[Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference), and
-rejects the container form outright as an unsupported source type. The vendored upstream
-skills under `skills/vendor/` stay out of the published set because `skills/vendor/`
-carries no `SKILL.md` of its own, so it isn't a skill directory; they stay reachable only
+Every manifest points at the same `agents/` directory and the same single skill
+directory. Scoping `skills` to `./skills/azure-capacity-management` keeps the vendored
+upstream skills under `skills/vendor/` out of the published set; they stay reachable only
 through this skill's `references/vendor/` path, as `SKILL.md` describes.
-`validate-manifests.py` pins the published set, so that keeps holding.
 
 ## Validation
 
@@ -195,9 +185,8 @@ That step is gone, per §1.4 — a package runner in CI is fetch-and-execute of 
 code on every run. The rules that validator enforced were reproduced in
 `validate-manifests.py` instead: component paths must be `./`-prefixed, `agents` must
 name a `*.agent.md` file rather than a directory, and neither Claude manifest may
-declare `agents` or `skills` at all — Claude Code discovers both from their
-directories, and declaring `agents` makes it load none while declaring `skills` makes
-it refuse the install.
+declare `agents` at all — Claude Code discovers agents from the `agents/` directory,
+and declaring the field makes it load none.
 
 The validator also parses all five manifests, checks that the fields they share agree,
 confirms every path a manifest points at exists, and validates each `agents/*.agent.md`

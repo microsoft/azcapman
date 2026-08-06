@@ -19,5 +19,8 @@
     "quota-group",
     "finops",
     "isv"
+  ],
+  "skills": [
+    "./skills/azure-capacity-management"
   ]
 }
