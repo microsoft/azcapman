@@ -244,9 +244,9 @@ before using it in other content.
   explicit tenant, subscription, resource group, and agent. It obtains the endpoint
   from the Azure Resource Manager agent resource and requests a
   `https://azuresre.dev` audience token. `sre-agent-plugin.sh` registers marketplaces,
-  installs standalone plugins, binds imported-skill tools, and removes the returned
-  test resources. `deploy-capacity-manager.sh` deploys this repository's skill and
-  custom agent through the v2 data plane. [Azure SRE Agent API
+  installs standalone plugins, binds imported-skill tools, inspects imported-skill
+  files, and removes the returned test resources. `deploy-capacity-manager.sh`
+  deploys this repository's skill and custom agent through the v2 data plane. [Azure SRE Agent API
   reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
   [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
 - Azure SRE Agent deployment uses the v2 `extendedAgent` data-plane paths for skills

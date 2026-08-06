@@ -18,6 +18,8 @@ Commands:
   plugin-list
   plugin-get         --name <installation-name>
   plugin-delete      --name <installation-name>
+  skill-list-files   --skill <skill-name>
+  skill-read-file    --skill <skill-name> --file-path <path>
 
 Connection options are passed to sre-agent-rest.sh and must include:
   --tenant <tenant-id> --subscription <subscription-id>
@@ -46,6 +48,8 @@ connection_args=()
 name=
 source_url=
 path_in_repo=
+skill=
+file_path=
 tools=()
 
 while [[ $# -gt 0 ]]; do
@@ -53,6 +57,8 @@ while [[ $# -gt 0 ]]; do
     --name) name=${2:?missing name value}; shift 2 ;;
     --source-url) source_url=${2:?missing source-url value}; shift 2 ;;
     --path-in-repo) path_in_repo=${2:?missing path-in-repo value}; shift 2 ;;
+    --skill) skill=${2:?missing skill value}; shift 2 ;;
+    --file-path) file_path=${2:?missing file-path value}; shift 2 ;;
     --tool) tools+=("${2:?missing tool value}"); shift 2 ;;
     *) connection_args+=("$1"); shift ;;
   esac
@@ -64,6 +70,18 @@ require_name() {
 
 require_source_url() {
   [[ -n "$source_url" ]] || fail "--source-url is required for $command"
+}
+
+require_skill() {
+  [[ -n "$skill" ]] || fail "--skill is required for $command"
+}
+
+require_file_path() {
+  [[ -n "$file_path" ]] || fail "--file-path is required for $command"
+}
+
+url_encode() {
+  python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$1"
 }
 
 tmp_dir=$(mktemp -d)
@@ -118,6 +136,17 @@ case "$command" in
   plugin-delete)
     require_name
     "$rest_helper" delete "${connection_args[@]}" --path "/api/v2/plugins/installations/${name}"
+    ;;
+  skill-list-files)
+    require_skill
+    "$rest_helper" post "${connection_args[@]}" \
+      --path "/api/v2/agent/skills/$(url_encode "$skill")/showFileContents"
+    ;;
+  skill-read-file)
+    require_skill
+    require_file_path
+    "$rest_helper" post "${connection_args[@]}" \
+      --path "/api/v2/agent/skills/$(url_encode "$skill")/showFileContents?filePath=$(url_encode "$file_path")"
     ;;
   *)
     fail "unsupported command: $command"

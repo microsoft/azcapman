@@ -17,8 +17,9 @@ Usage:
   /api/v2/plugins/marketplaces
   /api/v2/plugins/installations
 
-put, patch, and post require --body. The script verifies the supplied tenant
-matches the supplied subscription before requesting the SRE Agent endpoint.
+put and patch require --body. post accepts an optional --body. The script verifies
+the supplied tenant matches the supplied subscription before requesting the SRE Agent
+endpoint.
 EOF
 }
 
@@ -68,9 +69,10 @@ esac
 [[ -z "$kind" || -z "$path" ]] || fail "use either --kind or --path, not both"
 [[ -n "$kind" || -n "$path" ]] || fail "--kind or --path is required"
 
-if [[ "$operation" == put || "$operation" == patch || "$operation" == post ]]; then
+if [[ "$operation" == put || "$operation" == patch ]]; then
   [[ -n "$body" && -f "$body" ]] || fail "--body must name an existing JSON file"
 fi
+[[ -z "$body" || -f "$body" ]] || fail "--body must name an existing JSON file"
 
 actual_tenant=$(az account show --subscription "$subscription" --query tenantId -o tsv)
 [[ "$actual_tenant" == "$tenant" ]] ||

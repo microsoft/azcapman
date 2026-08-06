@@ -121,9 +121,11 @@ documentation](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketpl
 describes marketplace registration and commit-pinned plugin installations.
 
 The same agent accepted `POST /api/v2/plugins/install-direct` with
-`sourceUrl: "microsoft/azcapman"` and `pathInRepo: ""`, importing one skill under the
-generated name `azure-capacity-management-azure-capacity-management`. The installation
-record retained the source commit and the imported skill's
+`sourceUrl: "microsoft/azcapman"` and `pathInRepo: ""`, importing one skill. The
+importer suffixed the skill name when a direct skill with the source name already
+existed; after that direct skill was removed, the focused reference test imported
+`azure-capacity-management`. The installation record retained the source commit and
+the imported skill's
 `sourcePluginInstallation` reference. The [standalone installation
 documentation](https://learn.microsoft.com/en-us/azure/sre-agent/install-plugin-from-url)
 documents the direct-install request shape.
@@ -143,3 +145,17 @@ confirmed that the skills, agents, plugin-installation, and marketplace-registra
 lists contained none of the test resources. This test did not validate a
 marketplace-selected plugin installation because the current REST documentation
 exposes marketplace registration and listing but not a marketplace-install request.
+
+### Reference-import verification
+
+After a fresh standalone installation with no colliding direct skill, the authenticated
+Agent Canvas file-content endpoint returned one root file, `SKILL.md`. It returned
+`{ "data": [] }` for
+`references/docs/operations/capacity-and-quotas/README.md`,
+`references/scripts/quota/README.md`, and `references/vendor/MANIFEST.md`. The
+imported plugin workspace did not contain this repository's linked `references/docs`,
+`references/scripts`, or `references/vendor` roots. The helper's `skill-list-files`
+and `skill-read-file` commands reproduce that listing and read operation. The
+[skills documentation](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
+describes supporting files as a skill component, but it doesn't describe this importer
+behavior.

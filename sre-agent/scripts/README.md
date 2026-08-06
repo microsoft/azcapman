@@ -39,6 +39,27 @@ Use `--kind` for `/api/v2/extendedAgent/<kind>` resources. Use `--path` for othe
 
 The direct-install endpoint imports the skill without tool bindings in the tested service. `plugin-install-direct` reads each imported skill and sends the complete resource through `PATCH` with the supplied tool list. The [skills documentation](https://learn.microsoft.com/en-us/azure/sre-agent/skills) identifies Azure CLI tools as attachable skill tools. `marketplace-get`, `marketplace-delete`, `plugin-get`, `plugin-delete`, and the two `*-list` commands read or remove the returned resource names. The tested marketplace item endpoint returns `405` for both `PATCH` and `PUT`, so the helper doesn't expose an update command.
 
+`skill-list-files` and `skill-read-file` call the Agent Canvas file-content endpoint for an installed skill:
+
+```bash
+./sre-agent/scripts/sre-agent-plugin.sh skill-list-files \
+  --tenant <tenant-id> \
+  --subscription <subscription-id> \
+  --resource-group <resource-group> \
+  --agent <agent-name> \
+  --skill azure-capacity-management
+
+./sre-agent/scripts/sre-agent-plugin.sh skill-read-file \
+  --tenant <tenant-id> \
+  --subscription <subscription-id> \
+  --resource-group <resource-group> \
+  --agent <agent-name> \
+  --skill azure-capacity-management \
+  --file-path SKILL.md
+```
+
+The same live test returned only `SKILL.md`; reads of this repository's linked `references/docs`, `references/scripts`, and `references/vendor` paths returned empty data. The [skills documentation](https://learn.microsoft.com/en-us/azure/sre-agent/skills) describes supporting files as a skill component, but the tested plugin import didn't carry these links into the imported workspace.
+
 `deploy-capacity-manager.sh` creates the v2 envelopes for this repository's skill and subagent, then sends both `PUT` requests:
 
 ```bash
