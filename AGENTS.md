@@ -2,9 +2,8 @@
 
 This file governs every contribution to this repository, human or AI. It is the
 canonical source for scope, voice, and style referenced elsewhere in this repository
-(`PRD.md`, `RTM.md`, `agents/azure-capacity-manager.agent.md`,
-`skills/azure-capacity-management/SKILL.md`, `sre-agent/`). If any other file's
-guidance conflicts with this one, this file wins.
+(`PRD.md`, `RTM.md`). If any other file's guidance conflicts with this one, this file
+wins.
 
 ## 1. Hard rules
 
@@ -51,23 +50,7 @@ run its business.
 or program, it fails. If it reads like a citation-backed description of what an
 Azure control does and how to invoke it, it's fine.
 
-### 1.3 Exemption: vendored upstream content
-
-Content under `skills/vendor/**` that is listed in `skills/vendor/MANIFEST.md`'s
-source-mapping table is unmodified, upstream Microsoft material from
-[`microsoft/azure-skills`](https://github.com/microsoft/azure-skills) — tracked and
-attributed via `MANIFEST.md`, not authored by this repository. It is exempt from
-§§1.1–1.2's citation-per-claim and no-opinion rules, and from §4's scope boundaries
-(for example, vendored `azure-cost` content in scope as vendored material even though
-this repository's own authored docs stay narrowly focused on capacity — see §4). Never
-edit a vendored file to bring it into compliance with this document; if it needs to
-change, re-copy it from its source link in `MANIFEST.md` per the update procedure in
-`skills/azure-capacity-management/SKILL.md`. This exemption applies only to files listed
-in `MANIFEST.md`'s mapping table — it does not cover `MANIFEST.md` itself or any
-repository-authored text (for example, `SKILL.md`'s routing table), which remain fully
-governed by this document.
-
-### 1.4 Verified, pinned dependencies
+### 1.3 Verified, pinned dependencies
 
 This repository's CI, scripts, and packaging execute third-party code. Every such
 dependency is a supply chain entry point into anyone who clones or installs this
@@ -249,9 +232,6 @@ before using it in other content.
   the published site.
 - `scripts/` — PowerShell and Python tools for quota, capacity, and rate analysis.
   Each script's directory has its own `README.md`.
-- `agents/`, `skills/`, `sre-agent/` — packaging of this repository's content as an
-  agent, skill, or SRE Agent plugin. These reference `docs/` and `scripts/` via
-  symlinks or citations; they do not fork or restate the content.
 - `done/` — completed task records for this repository's own build process, not
   end-user documentation.
 - Run `python scripts/generate_citation_matrix.py` after adding or changing
@@ -262,12 +242,9 @@ before using it in other content.
 Before considering any documentation change complete, confirm:
 
 - [ ] Every factual claim has an inline citation to a canonical source
-      ([1.1](#11-no-fabrication--everything-links-to-a-canonical-source)) — **except**
-      files listed in `skills/vendor/MANIFEST.md`, which are exempt
-      ([1.3](#13-exemption-vendored-upstream-content))
+      ([1.1](#11-no-fabrication--everything-links-to-a-canonical-source))
 - [ ] No operational opinions, best practices, or runbooks
-      ([1.2](#12-no-operations-no-best-practices-no-opinions)) — same vendored-content
-      exemption applies
+      ([1.2](#12-no-operations-no-best-practices-no-opinions))
 - [ ] Sentence-style capitalization used throughout, no title case
 - [ ] No prohibited words ([Section 6](#6-writing-style))
 - [ ] Terminology matches `docs/operations/glossary.md`; new terms added there first
@@ -275,5 +252,5 @@ Before considering any documentation change complete, confirm:
 - [ ] Citation matrix regenerated if citations changed
 - [ ] Any new third-party dependency has a verified publisher and a pinned version,
       no workflow step fetches and executes code, and every action is pinned to a
-      commit SHA ([1.4](#14-verified-pinned-dependencies)) — run
+      commit SHA ([1.3](#13-verified-pinned-dependencies)) — run
       `python3 .github/scripts/check-supply-chain.py`

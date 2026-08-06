@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Enforce AGENTS.md rule 1.4 against this repository's own CI definitions.
+"""Enforce AGENTS.md rule 1.3 against this repository's own CI definitions.
 
 Scope: workflow files under .github/workflows and composite action definitions
 under .github/actions. Parses YAML and walks jobs -> steps, so a folded or
@@ -7,8 +7,7 @@ literal block scalar can't hide a piped installer across a line break.
 
 This is a tripwire that catches mistakes in review. It is not the root of trust:
 a pull request can edit this file, so the controls that actually bind are branch
-protection, CODEOWNERS on .github/**, and org-level action policy. See
-README-plugin.md.
+protection, CODEOWNERS on .github/**, and org-level action policy.
 
 Standard library plus PyYAML, which is preinstalled on GitHub-hosted runners.
 """
