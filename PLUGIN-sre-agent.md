@@ -137,7 +137,9 @@ lists those Azure CLI tools as attachable skill tools. `sre-agent-plugin.sh` per
 that post-install PATCH when invoked with `--tool`.
 
 `DELETE /api/v2/plugins/installations/{name}` removed the installation and caused its
-imported skill to return HTTP 404, while the separately deployed
-`azure-capacity-management` skill remained present. This test did not validate a
+imported skill to return HTTP 404. The final test cleanup deleted the separately
+deployed `azure-capacity-management` skill and `capacity-manager` custom agent, then
+confirmed that the skills, agents, plugin-installation, and marketplace-registration
+lists contained none of the test resources. This test did not validate a
 marketplace-selected plugin installation because the current REST documentation
 exposes marketplace registration and listing but not a marketplace-install request.
