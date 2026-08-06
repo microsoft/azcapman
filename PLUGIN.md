@@ -6,7 +6,7 @@ Per-harness canonical requirements for agent plugins and marketplaces, sourced f
 
 | Harness | Spec documented | Experiment status |
 | --- | --- | --- |
-| Claude Code | Done | Failed — tested via `marketplace add . --scope local` (local path), which is invalid per requirement to test the real online install path from GitHub. Manifests pass `claude plugin validate --strict`; install-from-GitHub not yet verified |
+| Claude Code | Done | Verified — real online install from GitHub: `claude plugin marketplace add microsoft/azcapman#restore-claude-copilot-plugins` (user scope, clones over HTTPS from `github.com/microsoft/azcapman`), `claude plugin install azure-capacity-management@azcapman` (installed, enabled, user scope, on-disk cache confirmed), then `claude plugin uninstall` and `claude plugin marketplace remove` (both confirmed removed). Tested against PR #30 branch `restore-claude-copilot-plugins`; will re-verify against `main` once merged |
 | GitHub Copilot CLI | Done | Failed — tested via `--plugin-dir .` (local dir), which is invalid per requirement to test the real online install path from GitHub. Install-from-repo not yet verified |
 | Codex | Done | Not started |
 | Azure SRE Agent | Done | Not started |
