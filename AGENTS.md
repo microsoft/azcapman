@@ -1,9 +1,8 @@
 # AGENTS.md — repository constitution
 
 This file governs every contribution to this repository, human or AI. It is the
-canonical source for scope, voice, and style referenced elsewhere in this repository
-(`PRD.md`, `RTM.md`). If any other file's guidance conflicts with this one, this file
-wins.
+canonical source for scope, voice, and style referenced elsewhere in this repository.
+If any other file's guidance conflicts with this one, this file wins.
 
 ## 1. Hard rules
 
@@ -27,6 +26,14 @@ list.
 - `scripts/generate_citation_matrix.py` builds a traceability report from citations
   already in the docs. It is a downstream report, not the enforcement mechanism —
   the enforcement mechanism is you, at authoring time.
+
+Agent plugins and skills:
+- https://code.claude.com/docs/en/plugin-marketplaces
+- https://learn.chatgpt.com/docs/plugins?surface=cli
+- https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-marketplace
+- https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-creating
+- https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace
+- https://agentskills.io/specification
 
 ### 1.2 No operations, no best practices, no opinions
 
