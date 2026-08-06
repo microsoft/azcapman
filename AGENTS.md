@@ -32,7 +32,6 @@ Agent plugins and skills:
 - https://learn.chatgpt.com/docs/plugins?surface=cli
 - https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-marketplace
 - https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-creating
-- https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace
 - https://agentskills.io/specification
 
 ### 1.2 No operations, no best practices, no opinions
@@ -239,21 +238,6 @@ before using it in other content.
   the published site.
 - `scripts/` — PowerShell and Python tools for quota, capacity, and rate analysis.
   Each script's directory has its own `README.md`.
-- `sre-agent/scripts/` — Azure SRE Agent REST helpers. `sre-agent-rest.sh` performs
-  data-plane `list`, `get`, `put`, `patch`, `delete`, and `post` requests using an
-  explicit tenant, subscription, resource group, and agent. It obtains the endpoint
-  from the Azure Resource Manager agent resource and requests a
-  `https://azuresre.dev` audience token. `sre-agent-plugin.sh` registers marketplaces,
-  installs standalone plugins, binds imported-skill tools, inspects imported-skill
-  files, and removes the returned test resources. `deploy-capacity-manager.sh`
-  deploys this repository's skill and custom agent through the v2 data plane. [Azure SRE Agent API
-  reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
-  [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
-- Azure SRE Agent deployment uses the v2 `extendedAgent` data-plane paths for skills
-  and custom agents. Do not use `srectl` or v1 `AgentConfiguration` artifacts here;
-  neither is part of the documented deployment path. [Azure SRE Agent API
-  reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference) [Azure
-  SRE Agent IaC templates](https://github.com/microsoft/sre-agent/tree/main/sreagent-templates)
 - `done/` — completed task records for this repository's own build process, not
   end-user documentation.
 - Run `python scripts/generate_citation_matrix.py` after adding or changing

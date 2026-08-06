@@ -27,5 +27,4 @@
 # Manifests and the agent file that determine what ships to anyone installing this
 # repository as a plugin.
 /.claude-plugin/ @MSBrett
-/.codex-plugin/ @MSBrett
 /agents/ @MSBrett
