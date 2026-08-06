@@ -9,7 +9,7 @@ Per-harness canonical requirements for agent plugins and marketplaces, sourced f
 | Claude Code | Done | Tested (2026-08-06) — real online install from `main`: `claude plugin marketplace add microsoft/azcapman`, `claude plugin install azure-capacity-management@azcapman`. Symlinks preserved as real relative symlinks with content correctly reachable through them. Cleaned up, no residue. See "Empirical test result" under Claude Code § Plugin caching and file resolution |
 | GitHub Copilot CLI | Done | Tested (2026-08-06) — real online install directly from the repo: `copilot plugin install microsoft/azcapman`. Succeeds; symlinks dereferenced into real, fully-populated directories (not symlinks, not empty). CLI itself warns direct repo installs are deprecated in favor of marketplace installs. Cleaned up, no residue. See "Empirical test result" under GitHub Copilot CLI § Install cache and symlink handling |
 | Codex | Done | Tested (2026-08-06) — real online install: `codex plugin marketplace add microsoft/azcapman --ref main`, `codex plugin add azure-capacity-management@azcapman`. Required restoring `.codex-plugin/plugin.json` (missing from `main`, restored in `2601b18`) in addition to the `marketplace.json` added in `5fd7364`. Marketplace clone preserves the symlinks intact; the plugin-install cache-copy step silently drops all three, leaving the reference content completely absent with no error. See "Empirical test result" under Codex § Symlink handling |
-| Azure SRE Agent | Done | Not started |
+| Azure SRE Agent | Done | Tested (2026-08-06) — marketplace registration and standalone plugin import from `microsoft/azcapman` succeeded. The importer created one skill but no tool bindings; a complete-object data-plane PATCH attached the three Azure CLI tools. Marketplace registrations, installations, imported skills, and direct-deployment test resources were removed afterward. See Azure SRE Agent § Live data-plane verification |
 
 ## Claude Code
 
@@ -300,6 +300,7 @@ Real online install directly from the GitHub repo: `copilot plugin install micro
 ### Source documents
 
 - [Plugin Marketplace in Azure SRE Agent (Microsoft Learn; ms.date: 2026-06-02; git_commit_id: f85079a3a3df6f64ede19ec060b0fc465d43cf65)](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
+- [Install a plugin from a URL in Azure SRE Agent (Microsoft Learn)](https://learn.microsoft.com/en-us/azure/sre-agent/install-plugin-from-url)
 - [Custom agents in Azure SRE Agent (Microsoft Learn; ms.date: 2026-03-18; git_commit_id: 734020337b79230be3cbfc48b30b9c47aad18eca)](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
 - [Skills in Azure SRE Agent (Microsoft Learn; ms.date: 2026-03-18; git_commit_id: 734020337b79230be3cbfc48b30b9c47aad18eca)](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
 
@@ -310,6 +311,8 @@ Azure SRE Agent's plugin marketplace page defines a plugin as a portable, instal
 The same table says skills add investigation runbooks, troubleshooting playbooks, and operational procedures, while MCP servers add tool integrations that configure as connectors with pre-filled endpoints and authentication. [Plugin marketplace, 2026-06-02, f85079a3a3df6f64ede19ec060b0fc465d43cf65](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
 
 These three pages don't document custom agents as a plugin component; instead, the custom-agents page documents custom agents separately under **Builder > Agent Canvas**. [Plugin marketplace, 2026-06-02, f85079a3a3df6f64ede19ec060b0fc465d43cf65](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) [Custom agents, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
+
+For this repository, the Azure SRE Agent package boundary is therefore the `skills/azure-capacity-management/` skill content and an optional `.mcp.json` connector declaration. `sre-agent/subagent/capacity-manager.yaml` isn't imported by marketplace or standalone plugin installation; `deploy-capacity-manager.sh` deploys it separately through the v2 `extendedAgent/agents` endpoint. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) [Azure SRE Agent API reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
 
 ### Manifest files and conventional locations
 
@@ -344,6 +347,8 @@ The page says the portal supports two `.mcp.json` formats: a nested format that 
 
 The page also says the portal detects both formats automatically. [Plugin marketplace, 2026-06-02, f85079a3a3df6f64ede19ec060b0fc465d43cf65](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
 
+An installed plugin records MCP requirements but doesn't configure its connector. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
+
 ### Version pinning and public marketplaces
 
 The plugin marketplace page says each installation is pinned to a specific git commit, and it later says each plugin installation is pinned to the exact git commit at install time. [Plugin marketplace, 2026-06-02, f85079a3a3df6f64ede19ec060b0fc465d43cf65](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
@@ -354,13 +359,9 @@ The page lists two well-known public marketplaces: [Azure SRE Agent Plugins](htt
 
 The live page's only explicit cross-format naming is the **GitHub Copilot** versus **Other formats** distinction in the **Marketplace formats** table. [Plugin marketplace, 2026-06-02, f85079a3a3df6f64ede19ec060b0fc465d43cf65](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
 
-### Custom-agent YAML and authoring surface
+### Custom-agent deployment
 
-Across the live custom-agent examples on the custom-agents and skills pages, the documented top-level YAML fields are `name`, `system_prompt`, `handoff_description`, `tools`, `connectors`, `enable_skills`, and `allowed_skills`. [Custom agents, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) [Skills, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
-
-Both examples are flat top-level mappings, and neither page shows an `api_version` or `kind` envelope around the YAML. [Custom agents, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) [Skills, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
-
-The custom-agents page says to create custom agents in **Builder > Agent Canvas**, and its portal flow is **Agent Canvas** tab > **Create** > **Custom Agent**. [Custom agents, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
+Custom agents aren't an Azure SRE Agent plugin component. This repository deploys its `capacity-manager` custom agent separately as an `ExtendedAgent` through `PUT /api/v2/extendedAgent/agents/{name}`; its skill uses `PUT /api/v2/extendedAgent/skills/{name}`. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) [Azure SRE Agent API reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
 
 ### Skills and skill constraints
 
@@ -381,6 +382,16 @@ The same constraints table says active skills clear on conversation compaction. 
 The same constraints table says skill-attached tools are available only while the skill is active. [Skills, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
 
 The page also says that if the agent needs a skill's tools after the skill unloads, it re-reads `SKILL.md` to reactivate the skill. [Skills, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
+
+### Live data-plane verification
+
+On 2026-08-06, the non-production `azcapman-sre` agent accepted a marketplace registration with `spec.sourceUrl: "microsoft/azcapman"` and transitioned it from `Cloning` to `Ready`. Item `GET` and `DELETE` worked; item `PATCH` and `PUT` returned HTTP 405. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
+
+The agent also accepted the [documented direct-install request](https://learn.microsoft.com/en-us/azure/sre-agent/install-plugin-from-url) at `POST /api/v2/plugins/install-direct` with `sourceUrl: "microsoft/azcapman"` and `pathInRepo: ""`. It imported `azure-capacity-management-azure-capacity-management`, pinned the installation to the tested commit, and recorded the source installation on the imported skill.
+
+The importer set the imported skill's `tools` array to empty even though `SKILL.md` contains a YAML `tools` field. A full-object `PATCH /api/v2/extendedAgent/skills/{name}` then persisted `RunAzCliReadCommands`, `RunAzCliWriteCommands`, and `GetAzCliHelp`. The [skills documentation](https://learn.microsoft.com/en-us/azure/sre-agent/skills) lists those Azure CLI tools as attachable skill tools. `sre-agent/scripts/sre-agent-plugin.sh plugin-install-direct --tool <tool-name>` implements that tested post-import binding.
+
+`DELETE /api/v2/plugins/installations/{name}` removed the imported skill. Final cleanup also removed the separately deployed skill and custom agent, and list calls confirmed no test marketplace registration, plugin installation, imported skill, direct skill, or custom agent remained.
 
 ### Symlink handling
 
