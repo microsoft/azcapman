@@ -2,6 +2,15 @@
 
 Per-harness canonical requirements for agent plugins and marketplaces, sourced from each vendor's live documentation. See AGENTS.md for citation and scope rules governing this document.
 
+## Status
+
+| Harness | Spec documented | Experiment status |
+| --- | --- | --- |
+| Claude Code | Done | Failed — tested via `marketplace add . --scope local` (local path), which is invalid per requirement to test the real online install path from GitHub. Manifests pass `claude plugin validate --strict`; install-from-GitHub not yet verified |
+| GitHub Copilot CLI | Done | Failed — tested via `--plugin-dir .` (local dir), which is invalid per requirement to test the real online install path from GitHub. Install-from-repo not yet verified |
+| Codex | Done | Not started |
+| Azure SRE Agent | Done | Not started |
+
 ## Claude Code
 
 ### Marketplace manifest

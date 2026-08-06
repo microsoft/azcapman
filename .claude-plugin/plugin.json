@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "azure-capacity-management",
+  "displayName": "Azure capacity management",
+  "version": "1.0.0",
+  "description": "Estate-level Azure quota, capacity, reservation, monitoring, and billing controls for SaaS ISVs operating workloads in ISV-owned subscriptions under EA or MCA.",
+  "author": {
+    "name": "Microsoft",
+    "url": "https://github.com/microsoft/azcapman"
+  },
+  "homepage": "https://github.com/microsoft/azcapman",
+  "repository": "https://github.com/microsoft/azcapman",
+  "license": "MIT",
+  "keywords": [
+    "azure",
+    "capacity",
+    "quota",
+    "capacity-reservation",
+    "quota-group",
+    "finops",
+    "isv"
+  ]
+}
