@@ -404,6 +404,12 @@ The importer set the imported skill's `tools` array to empty even though `SKILL.
 
 `DELETE /api/v2/plugins/installations/{name}` removed the imported skill. Final cleanup also removed the separately deployed skill and custom agent, and list calls confirmed no test marketplace registration, plugin installation, imported skill, direct skill, or custom agent remained.
 
+#### No-PATCH control test (2026-08-06)
+
+Microsoft's [Azure Managed Grafana plugin manifest](https://github.com/Azure/sre-agent-plugins/blob/484e5ca1108d52bbc09fbf90e0f07681a302608a/plugins/azure-managed-grafana/plugin.json) declares `skills: ["skills/"]` and an `.mcp.json` configuration file. The standalone installer accepted `Azure/sre-agent-plugins` at `plugins/azure-managed-grafana` without a PATCH and returned one imported skill, `azure_managed_grafana`. The [plugin marketplace documentation](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) says plugins can contain skills and MCP integrations, while the [standalone-install documentation](https://learn.microsoft.com/en-us/azure/sre-agent/install-plugin-from-url) requires a `plugin.json` file and a `skills/` folder.
+
+The `azcapman-sre` read-back result for that installation had `mcpServers: null`, and its imported skill had `tools: []`. This is a live observation for the tested agent and source commit, not a claim that the documented package format is unsupported. The installation was then deleted without PATCH; its skill returned HTTP 404 and the installation list was empty.
+
 ### Symlink handling
 
 None of these three Microsoft Learn pages mentions symlink handling for plugin content, custom-agent content, skill content, or manifest resolution. [Plugin marketplace, 2026-06-02, f85079a3a3df6f64ede19ec060b0fc465d43cf65](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) [Custom agents, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents) [Skills, 2026-03-18, 734020337b79230be3cbfc48b30b9c47aad18eca](https://learn.microsoft.com/en-us/azure/sre-agent/skills)

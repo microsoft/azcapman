@@ -146,6 +146,25 @@ lists contained none of the test resources. This test did not validate a
 marketplace-selected plugin installation because the current REST documentation
 exposes marketplace registration and listing but not a marketplace-install request.
 
+### No-PATCH control test
+
+On 2026-08-06, the non-production `azcapman-sre` agent accepted a standalone install
+of Microsoft's Azure Managed Grafana plugin from
+`Azure/sre-agent-plugins`, path `plugins/azure-managed-grafana`. Its
+[manifest](https://github.com/Azure/sre-agent-plugins/blob/484e5ca1108d52bbc09fbf90e0f07681a302608a/plugins/azure-managed-grafana/plugin.json)
+declares `skills: ["skills/"]` and `.mcp.json`. The installer returned one imported
+skill, `azure_managed_grafana`, and no PATCH was sent. The [plugin marketplace
+documentation](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
+describes skills and MCP integrations as plugin components; the [standalone-install
+documentation](https://learn.microsoft.com/en-us/azure/sre-agent/install-plugin-from-url)
+requires `plugin.json` and `skills/`.
+
+The installation read-back returned `mcpServers: null`; the imported skill read-back
+returned `tools: []`. This records the response from the tested agent and source
+commit, not a general unsupported-feature claim. Deleting the installation removed
+the skill, its subsequent `GET` returned HTTP 404, and the installation list was
+empty.
+
 ### Reference-import verification
 
 After a fresh standalone installation with no colliding direct skill, the authenticated
