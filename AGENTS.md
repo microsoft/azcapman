@@ -243,9 +243,12 @@ before using it in other content.
   data-plane `list`, `get`, `put`, `patch`, `delete`, and `post` requests using an
   explicit tenant, subscription, resource group, and agent. It obtains the endpoint
   from the Azure Resource Manager agent resource and requests a
-  `https://azuresre.dev` audience token. `deploy-capacity-manager.sh` deploys this
-  repository's skill and custom agent through the v2 data plane. [Azure SRE Agent API
+  `https://azuresre.dev` audience token. `sre-agent-plugin.sh` registers marketplaces,
+  installs standalone plugins, binds imported-skill tools, and removes the returned
+  test resources. `deploy-capacity-manager.sh` deploys this repository's skill and
+  custom agent through the v2 data plane. [Azure SRE Agent API
   reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
+  [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
 - Azure SRE Agent deployment uses the v2 `extendedAgent` data-plane paths for skills
   and custom agents. Do not use `srectl` or v1 `AgentConfiguration` artifacts here;
   neither is part of the documented deployment path. [Azure SRE Agent API

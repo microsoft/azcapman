@@ -109,3 +109,35 @@ This test deployed a skill and custom agent directly. It did not validate a
 plugin marketplace install. The plugin marketplace remains limited to skills and
 MCP integrations, while custom agents use the separate data-plane `agents`
 resource. [Plugin marketplace](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace) [Azure SRE Agent API reference](https://learn.microsoft.com/en-us/azure/sre-agent/api-reference)
+
+### Live marketplace and plugin verification
+
+On 2026-08-06, the non-production `azcapman-sre` agent accepted a marketplace
+registration at `POST /api/v2/plugins/marketplaces` with
+`metadata.name` and `spec.sourceUrl: "microsoft/azcapman"`. Its clone state changed
+from `Cloning` to `Ready`. Item `GET` and `DELETE` returned the registered record and
+removed it; both item `PATCH` and `PUT` returned HTTP 405. The [plugin marketplace
+documentation](https://learn.microsoft.com/en-us/azure/sre-agent/plugin-marketplace)
+describes marketplace registration and commit-pinned plugin installations.
+
+The same agent accepted `POST /api/v2/plugins/install-direct` with
+`sourceUrl: "microsoft/azcapman"` and `pathInRepo: ""`, importing one skill under the
+generated name `azure-capacity-management-azure-capacity-management`. The installation
+record retained the source commit and the imported skill's
+`sourcePluginInstallation` reference. The [standalone installation
+documentation](https://learn.microsoft.com/en-us/azure/sre-agent/install-plugin-from-url)
+documents the direct-install request shape.
+
+The imported skill initially had an empty `tools` array, even with a `tools` YAML
+front-matter field in `SKILL.md`. Sending the complete imported skill resource through
+`PATCH /api/v2/extendedAgent/skills/{name}` with the three Azure CLI tools persisted
+`RunAzCliReadCommands`, `RunAzCliWriteCommands`, and `GetAzCliHelp`. The
+[skills documentation](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
+lists those Azure CLI tools as attachable skill tools. `sre-agent-plugin.sh` performs
+that post-install PATCH when invoked with `--tool`.
+
+`DELETE /api/v2/plugins/installations/{name}` removed the installation and caused its
+imported skill to return HTTP 404, while the separately deployed
+`azure-capacity-management` skill remained present. This test did not validate a
+marketplace-selected plugin installation because the current REST documentation
+exposes marketplace registration and listing but not a marketplace-install request.
