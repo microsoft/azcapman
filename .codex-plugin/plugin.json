@@ -1,7 +1,0 @@
-{
-  "name": "azure-capacity-management",
-  "version": "1.0.0",
-  "description": "Estate-level Azure quota, capacity, reservation, monitoring, and billing controls for SaaS ISVs operating workloads in ISV-owned subscriptions under EA or MCA.",
-  "license": "MIT",
-  "skills": "skills/"
-}

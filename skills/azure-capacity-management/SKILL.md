@@ -9,10 +9,6 @@ description: |
   forecast/query APIs, not general cost optimization), Azure AI Gateway/APIM
   rate-limiting and throughput-control policies for AI workloads, and per-service
   resource/limit/quota reference lookups.
-tools:
-  - RunAzCliReadCommands
-  - RunAzCliWriteCommands
-  - GetAzCliHelp
 license: MIT
 ---
 
@@ -141,10 +137,6 @@ These are commonly confused — keep them separated:
 - **Logical vs physical zone:** [Logical zones](https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview#configuring-resources-for-availability-zone-support) are subscription-specific labels. Physical zones are datacenter locations. Zone 1 in subscription A may map to a different physical zone than zone 1 in subscription B.
 - **Region access vs quota increase:** Quota increases raise limits within an already-enabled region. [Region access requests](https://learn.microsoft.com/en-us/troubleshoot/azure/general/region-access-request-process) unblock a restricted region for the subscription.
 
-## Operational agent
-
-The `azure-capacity-manager` agent is a capacity evidence specialist for FinOps workflows. It handles operational tasks like quota analysis and reservation evaluation, maps Azure capacity evidence back to FinOps capabilities, has access to the same references, and can run scripts and `az` commands for live operations.
-
 ## Documentation map
 
 | Domain | Reference path |
@@ -210,82 +202,3 @@ it:
    `MANIFEST.md`. This is a refresh of existing content, not a re-scoping exercise — the
    8-target list itself only changes via a deliberate, separate decision, not as a side
    effect of a routine sync.
-
-## Notification procedures
-
-<!-- // T-20: RTM FR-10.1, FR-10.2 -->
-The capacity manager can send alerts and reports through [SRE Agent's notification connectors](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications). Use Teams for urgent capacity events and email for periodic reports.
-
-### Teams channel alerts
-
-Use Teams notifications for urgent capacity events that need immediate attention, following the [Azure SRE Agent notification guidance](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications). The SRE Agent sends messages through the Teams connector in HTML format, so keep the payload compact, scannable, and action-oriented, as described in [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
-
-**When to send Teams alerts:**
-- Quota utilization exceeds 80 percent for any VM family in a production region.
-- VM deployment fails with a quota or capacity error.
-- Capacity reservation group utilization drops below 50 percent, which points to wasted spend.
-- Quota group is depleted or nearly depleted.
-- Region access or zonal enablement request is needed.
-
-**Teams alert template:**
-
-Use this HTML template when you compose a Teams message. Include alert severity, the affected resource, current state, the recommended action, and links to the relevant Azure portal blades, following [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
-
-```html
-<h3>⚠️ Quota utilization alert</h3>
-<p><b>Severity:</b> warning<br>
-<b>VM family:</b> Standard_D_v5<br>
-<b>Region:</b> eastus<br>
-<b>Subscription:</b> prod-001<br>
-<b>Usage:</b> 85/100 vCPUs (85%)</p>
-<p><b>Recommended action:</b> Request a quota increase before the next deployment cycle.</p>
-<p>
-  <a href="https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade">Open quota blade</a><br>
-  <a href="https://portal.azure.com/#view/HubsExtension/BrowseResource/resourceType/Microsoft.Compute%2FcapacityReservationGroups">Open capacity reservation groups</a>
-</p>
-```
-
-### Email capacity reports
-
-Use Outlook email for periodic capacity reports and non-urgent recommendations, following the same [Azure SRE Agent notification guidance](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications). The SRE Agent sends email through the Outlook connector in HTML format, so structure the message for scanning first, and detailed follow-up second.
-
-**When to send email reports:**
-- Weekly capacity digest, including quota utilization trends across the estate.
-- Reservation expiring within 30 days, including a renewal recommendation and cost analysis.
-- Monthly savings plan optimization review.
-- Quarterly capacity planning summary.
-- Post-incident capacity analysis.
-
-**Email report template:**
-
-Use this HTML template for email reports. Include the report title, date range, a summary table of key metrics, highlighted findings, recommended actions with priority, and links to Azure portal resources or supporting documentation, as described in [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
-
-```html
-<h2>Weekly capacity digest</h2>
-<p><b>Period:</b> March 3–9, 2026<br>
-<b>Subscriptions analyzed:</b> 47</p>
-<h3>Key findings</h3>
-<table border="1" cellpadding="8">
-<tr><th>Region</th><th>VM family</th><th>Utilization</th><th>Action</th></tr>
-<tr><td>eastus</td><td>Standard_D_v5</td><td>92%</td><td>Request increase</td></tr>
-<tr><td>westus2</td><td>Standard_E_v5</td><td>78%</td><td>Monitor</td></tr>
-</table>
-<h3>Recommendations</h3>
-<ol>
-<li>Request quota increase for Standard_D_v5 in eastus (critical)</li>
-<li>Review CRG utilization in westeurope—45% utilized, consider right-sizing</li>
-<li>Savings plan expires April 15—evaluate renewal versus pay-as-you-go</li>
-</ol>
-<p>
-  <a href="https://portal.azure.com/#view/Microsoft_Azure_Capacity/QuotaMenuBlade">Open quota blade</a><br>
-  <a href="https://learn.microsoft.com/en-us/azure/quotas/how-to-guide-monitoring-alerting">Review quota monitoring guidance</a>
-</p>
-```
-
-### Scheduled notification patterns
-
-Configure recurring notifications with [Azure SRE Agent scheduled tasks](https://learn.microsoft.com/en-us/azure/sre-agent/scheduled-tasks), and pair the schedule with the connector flow from [Send notifications from Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/send-notifications).
-
-- Daily: quota utilization check, then send a Teams alert if any family is above 80 percent.
-- Weekly: capacity digest, then send email to stakeholders.
-- Monthly: savings plan and reservation review, then send email with recommendations.
