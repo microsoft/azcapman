@@ -8,25 +8,9 @@
   "plugins": [
     {
       "name": "azure-capacity-management",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/azure-capacity-management"
-      ],
+      "source": "./.github/plugins/azure-capacity-management",
       "description": "Estate-level Azure quota, capacity, reservation, monitoring, and billing controls for SaaS ISVs.",
-      "version": "1.0.0",
-      "license": "MIT",
-      "homepage": "https://github.com/microsoft/azcapman",
-      "repository": "https://github.com/microsoft/azcapman",
-      "keywords": [
-        "azure",
-        "capacity",
-        "quota",
-        "capacity-reservation",
-        "quota-group",
-        "finops",
-        "isv"
-      ]
+      "homepage": "https://github.com/microsoft/azcapman"
     }
   ]
 }
