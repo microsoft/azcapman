@@ -118,13 +118,12 @@ access to all secrets configured on your repository, and may be able to use the
 `.github/scripts/check-supply-chain.py` checks these mechanically, and
 `.github/scripts/test-supply-chain.py` covers each rule with a case that must fail.
 On their own they'd be tripwires rather than a root of trust, because a pull request
-can edit them in the same diff that weakens a workflow. Two controls outside the pull
-request close that gap on `main`:
+can edit them in the same diff that weakens a workflow. The `check` job is advisory so
+a GitHub-hosted runner queue can't block every pull request. Two controls outside the
+pull request remain on `main`:
 
 - [Branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
-  requires a pull request, blocks force pushes and branch deletion, requires linear
-  history, and makes the `validate` and `check` jobs required status checks, so a
-  branch that skips or breaks them can't merge.
+  requires a pull request and linear history.
 - The repository [actions permissions policy](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository)
   requires every action to be pinned to a full-length commit SHA and allows only
   GitHub-owned actions. GitHub applies this before a run starts, so it holds even for
