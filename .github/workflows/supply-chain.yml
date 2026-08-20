@@ -1,9 +1,7 @@
 name: Supply chain
 
 on:
-  push:
-    branches: [main]
-  # No paths filter. This runs as a required status check on main, and a required
+  # No paths filter. This runs as a required pull request check on main, and a required
   # check that never reports leaves a pull request stuck on "Expected" forever.
   pull_request:
     branches: [main]
