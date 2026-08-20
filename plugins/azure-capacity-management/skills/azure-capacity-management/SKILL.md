@@ -166,39 +166,179 @@ These are commonly confused — keep them separated:
 Content under `references/vendor/` is unmodified, byte-identical material copied from
 [`microsoft/azure-skills`](https://github.com/microsoft/azure-skills) — it is not
 azcapman-authored, is not edited to fit this skill's voice, and is exempt from AGENTS.md's
-authored-content rules per the exemption clause in AGENTS.md §1. Full source attribution,
-license text, and last-synced commit are in `references/vendor/MANIFEST.md`.
+authored-content rules per the exemption clause in AGENTS.md §1.
 
-| When to use | Vendored path | Attribution |
-|---|---|---|
-| VM/family core quota checks and increase requests (CLI-driven) | `references/vendor/azure-quotas/SKILL.md` | `references/vendor/MANIFEST.md` |
-| Cost forecast and cost query APIs scoped to capacity forecasting (not general cost optimization) | `references/vendor/azure-cost/SKILL.md` | `references/vendor/MANIFEST.md` |
-| Azure AI Gateway / APIM policies for AI workload throughput and rate-limit patterns | `references/vendor/azure-aigateway/SKILL.md` | `references/vendor/MANIFEST.md` |
-| VM/compute capacity reservations (creation, association/disassociation) | `references/vendor/azure-compute/workflows/capacity-reservation/capacity-reservation.md` | `references/vendor/MANIFEST.md` |
-| Azure OpenAI/Foundry model quota (TPM, PTU, cross-region capacity discovery) | `references/vendor/microsoft-foundry/quota/quota.md` | `references/vendor/MANIFEST.md` |
-| Foundry model deployment capacity checks during model deploy | `references/vendor/microsoft-foundry/models/deploy-model/capacity/SKILL.md` | `references/vendor/MANIFEST.md` |
-| General per-service resource/limit/quota reference table | `references/vendor/azure-prepare/references/resources-limits-quotas.md` | `references/vendor/MANIFEST.md` |
-| Region and SKU availability lookups | `references/vendor/azure-validate/references/region-availability.md` | `references/vendor/MANIFEST.md` |
+| When to use | Vendored path |
+|---|---|
+| VM/family core quota checks and increase requests (CLI-driven) | `references/vendor/azure-quotas/SKILL.md` |
+| Cost forecast and cost query APIs scoped to capacity forecasting (not general cost optimization) | `references/vendor/azure-cost/SKILL.md` |
+| Azure AI Gateway / APIM policies for AI workload throughput and rate-limit patterns | `references/vendor/azure-aigateway/SKILL.md` |
+| VM/compute capacity reservations (creation, association/disassociation) | `references/vendor/azure-compute/workflows/capacity-reservation/capacity-reservation.md` |
+| Azure OpenAI/Foundry model quota (TPM, PTU, cross-region capacity discovery) | `references/vendor/microsoft-foundry/quota/quota.md` |
+| Foundry model deployment capacity checks during model deploy | `references/vendor/microsoft-foundry/models/deploy-model/capacity/SKILL.md` |
+| General per-service resource/limit/quota reference table | `references/vendor/azure-prepare/references/resources-limits-quotas.md` |
+| Region and SKU availability lookups | `references/vendor/azure-validate/references/region-availability.md` |
 
 The three whole-skill copies (`azure-quotas`, `azure-cost`, `azure-aigateway`) keep their
 own internal `SKILL.md` structure for their own references and scripts — they are not
 separately registered as standalone skills in this repo; this skill is the only
 discovery path into them.
 
+### Vendored knowledge index
+
+Agent Skills load referenced resources on demand through
+[progressive disclosure](https://agentskills.io/specification#progressive-disclosure).
+Use this index to select the file that matches the task.
+
+#### Azure AI Gateway
+
+- [Skill overview](references/vendor/azure-aigateway/SKILL.md)
+- [Authentication](references/vendor/azure-aigateway/references/auth-best-practices.md)
+- [Patterns](references/vendor/azure-aigateway/references/patterns.md)
+- [Policies](references/vendor/azure-aigateway/references/policies.md)
+- [Python Content Safety SDK](references/vendor/azure-aigateway/references/sdk/azure-ai-contentsafety-py.md)
+- [TypeScript Content Safety SDK](references/vendor/azure-aigateway/references/sdk/azure-ai-contentsafety-ts.md)
+- [.NET API Management SDK](references/vendor/azure-aigateway/references/sdk/azure-mgmt-apimanagement-dotnet.md)
+- [Python API Management SDK](references/vendor/azure-aigateway/references/sdk/azure-mgmt-apimanagement-py.md)
+- [Troubleshooting](references/vendor/azure-aigateway/references/troubleshooting.md)
+
+#### Azure compute capacity reservations
+
+- [Capacity reservation workflow](references/vendor/azure-compute/workflows/capacity-reservation/capacity-reservation.md)
+- [Association and disassociation](references/vendor/azure-compute/workflows/capacity-reservation/references/association-disassociation.md)
+- [Capacity reservation overview](references/vendor/azure-compute/workflows/capacity-reservation/references/capacity-reservation-overview.md)
+
+#### Azure cost
+
+- [Skill overview](references/vendor/azure-cost/SKILL.md)
+- Cost forecast:
+  [error handling](references/vendor/azure-cost/cost-forecast/error-handling.md),
+  [examples](references/vendor/azure-cost/cost-forecast/examples.md),
+  [guardrails](references/vendor/azure-cost/cost-forecast/guardrails.md),
+  [request body schema](references/vendor/azure-cost/cost-forecast/request-body-schema.md),
+  and [workflow](references/vendor/azure-cost/cost-forecast/workflow.md).
+- Cost optimization:
+  [authentication](references/vendor/azure-cost/cost-optimization/auth-best-practices.md),
+  [AKS anomalies](references/vendor/azure-cost/cost-optimization/azure-aks-anomalies.md),
+  [AKS cost add-on](references/vendor/azure-cost/cost-optimization/azure-aks-cost-addon.md),
+  [Azure Quick Review](references/vendor/azure-cost/cost-optimization/azure-quick-review.md),
+  [Azure Resource Graph](references/vendor/azure-cost/cost-optimization/azure-resource-graph.md),
+  [report template](references/vendor/azure-cost/cost-optimization/report-template.md),
+  [.NET Redis SDK](references/vendor/azure-cost/cost-optimization/sdk/azure-resource-manager-redis-dotnet.md),
+  [Azure Cache for Redis](references/vendor/azure-cost/cost-optimization/services/redis/azure-cache-for-redis.md),
+  [Azure Storage](references/vendor/azure-cost/cost-optimization/services/storage/azure-storage.md),
+  and [workflow](references/vendor/azure-cost/cost-optimization/workflow.md).
+- Cost query:
+  [dimensions by scope](references/vendor/azure-cost/cost-query/dimensions-by-scope.md),
+  [error handling](references/vendor/azure-cost/cost-query/error-handling.md),
+  [examples](references/vendor/azure-cost/cost-query/examples.md),
+  [guardrails](references/vendor/azure-cost/cost-query/guardrails.md),
+  [request body schema](references/vendor/azure-cost/cost-query/request-body-schema.md),
+  and [workflow](references/vendor/azure-cost/cost-query/workflow.md).
+- [Tools and practices](references/vendor/azure-cost/references/tools-and-best-practices.md)
+
+#### Azure resource limits and quotas
+
+- [Service resource limits and quotas](references/vendor/azure-prepare/references/resources-limits-quotas.md)
+- [Quota skill overview](references/vendor/azure-quotas/SKILL.md)
+- [Advanced quota commands](references/vendor/azure-quotas/references/advanced-commands.md)
+- [Quota commands](references/vendor/azure-quotas/references/commands.md)
+- [PowerShell quota checker](references/vendor/azure-quotas/scripts/check-quota.ps1)
+- [Shell quota checker](references/vendor/azure-quotas/scripts/check-quota.sh)
+- [Region availability](references/vendor/azure-validate/references/region-availability.md)
+
+#### Microsoft Foundry model capacity
+
+- [Deployment capacity workflow](references/vendor/microsoft-foundry/models/deploy-model/capacity/SKILL.md)
+- Capacity discovery and ranking:
+  [PowerShell](references/vendor/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.ps1)
+  and [shell](references/vendor/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.sh).
+- Capacity query:
+  [PowerShell](references/vendor/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.ps1)
+  and [shell](references/vendor/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.sh).
+- [Quota overview](references/vendor/microsoft-foundry/quota/quota.md)
+- [Capacity planning](references/vendor/microsoft-foundry/quota/references/capacity-planning.md)
+- [Error resolution](references/vendor/microsoft-foundry/quota/references/error-resolution.md)
+- [Optimization](references/vendor/microsoft-foundry/quota/references/optimization.md)
+- [Provisioned throughput guide](references/vendor/microsoft-foundry/quota/references/ptu-guide.md)
+- [Troubleshooting](references/vendor/microsoft-foundry/quota/references/troubleshooting.md)
+- [Workflows](references/vendor/microsoft-foundry/quota/references/workflows.md)
+
+### Vendored source
+
+- Repository: [`microsoft/azure-skills`](https://github.com/microsoft/azure-skills)
+- Last synced commit: [`6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae`](https://github.com/microsoft/azure-skills/commit/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae)
+- Last synced date: 2026-07-19 (UTC)
+
+The commit is a snapshot marker. Update it when the vendored content is refreshed.
+
+| Vendored path | Upstream path |
+|---|---|
+| `references/vendor/azure-quotas/` | [`skills/azure-quotas/`](https://github.com/microsoft/azure-skills/tree/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/azure-quotas) |
+| `references/vendor/azure-cost/` | [`skills/azure-cost/`](https://github.com/microsoft/azure-skills/tree/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/azure-cost) |
+| `references/vendor/azure-aigateway/` | [`skills/azure-aigateway/`](https://github.com/microsoft/azure-skills/tree/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/azure-aigateway) |
+| `references/vendor/azure-compute/workflows/capacity-reservation/` | [`skills/azure-compute/workflows/capacity-reservation/`](https://github.com/microsoft/azure-skills/tree/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/azure-compute/workflows/capacity-reservation) |
+| `references/vendor/microsoft-foundry/quota/` | [`skills/microsoft-foundry/quota/`](https://github.com/microsoft/azure-skills/tree/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/microsoft-foundry/quota) |
+| `references/vendor/microsoft-foundry/models/deploy-model/capacity/` | [`skills/microsoft-foundry/models/deploy-model/capacity/`](https://github.com/microsoft/azure-skills/tree/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/microsoft-foundry/models/deploy-model/capacity) |
+| `references/vendor/azure-prepare/references/resources-limits-quotas.md` | [`skills/azure-prepare/references/resources-limits-quotas.md`](https://github.com/microsoft/azure-skills/blob/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/azure-prepare/references/resources-limits-quotas.md) |
+| `references/vendor/azure-validate/references/region-availability.md` | [`skills/azure-validate/references/region-availability.md`](https://github.com/microsoft/azure-skills/blob/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/skills/azure-validate/references/region-availability.md) |
+
+### Known dangling cross-references
+
+The partial copies retain upstream relative links that point outside the vendored
+paths:
+
+- `references/vendor/microsoft-foundry/models/deploy-model/capacity/SKILL.md`
+  links to `../preset/SKILL.md`, `../customize/SKILL.md`, and
+  `../SKILL.md#project-selection-all-modes`.
+- `references/vendor/azure-prepare/references/resources-limits-quotas.md`
+  refers to an `azure-provisioning-limit` skill that isn't present at the synced
+  commit.
+
+### License and attribution
+
+The vendored content is distributed under the
+[`microsoft/azure-skills` MIT License](https://github.com/microsoft/azure-skills/blob/6f4ff3f2f4f547bb3d42e2a00e72a1c47ffad5ae/LICENSE):
+
+```text
+MIT License
+
+Copyright 2025 (c) Microsoft Corporation.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+- author: Microsoft
+
 ## Updating vendored content
 
 `references/vendor/` is refreshed manually, not by a script or scheduled job. To update
 it:
 
-1. For each of the 8 paths listed in `references/vendor/MANIFEST.md`, re-fetch the file
+1. For each of the eight paths in the vendored source table, re-fetch the file
    from `microsoft/azure-skills`'s `main` branch (e.g. via `gh api` or `curl` against
    `raw.githubusercontent.com/microsoft/azure-skills/main/<path>`) and overwrite the
    vendored copy byte-for-byte.
 2. Verify each file with `git hash-object <file>` against the new upstream blob SHA
    (from the GitHub API for that path) to confirm an exact copy — no manual retyping or
    edits.
-3. Update `MANIFEST.md`'s "last synced" commit SHA and date to the new commit.
-4. Note any files added or removed upstream within those same 8 paths in
-   `MANIFEST.md`. This is a refresh of existing content, not a re-scoping exercise — the
-   8-target list itself only changes via a deliberate, separate decision, not as a side
+3. Update the last-synced commit SHA, date, and source links in this section.
+4. Note files added or removed upstream within those same eight paths here. The
+   target list only changes through a deliberate, separate decision, not as a side
    effect of a routine sync.

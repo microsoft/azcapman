@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "azcapman",
   "description": "Azure capacity and quota management for SaaS ISVs operating workloads in ISV-owned subscriptions under EA or MCA.",
   "owner": {
@@ -8,7 +9,7 @@
   "plugins": [
     {
       "name": "azure-capacity-management",
-      "source": "./.github/plugins/azure-capacity-management",
+      "source": "./plugins/azure-capacity-management",
       "description": "Estate-level Azure quota, capacity, reservation, monitoring, and billing controls for SaaS ISVs.",
       "homepage": "https://github.com/microsoft/azcapman"
     }
